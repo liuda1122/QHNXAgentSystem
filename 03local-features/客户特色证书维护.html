@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>客户管理 | 青海农信</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --brand-50:#E8F0FB; --brand-100:#D1DFF4; --brand-300:#6E97D6;
+      --brand-500:#2A66C2; --brand-700:#143F8F; --brand-900:#01256A;
+      --green-50:#ECFDF5; --green-500:#10B981; --green-700:#047857;
+      --success:#10B981; --success-bg:#ECFDF5; --success-border:#A7F3D0;
+      --warning:#D97706; --warning-bg:#FFFBEB; --warning-border:#FDE68A;
+      --danger:#DC2626;  --danger-bg:#FEF2F2;  --danger-border:#FECACA;
+      --info:#2A66C2;    --info-bg:#E8F0FB;    --info-border:#D1DFF4;
+      --ink-900:#0F172A; --ink-800:#1E293B; --ink-700:#334155; --ink-600:#475569;
+      --ink-500:#64748B; --ink-400:#94A3B8; --ink-300:#CBD5E1;
+      --line-200:#E2E8F0; --bg-muted:#F1F5F9; --bg-subtle:#F8FAFC; --white:#FFFFFF;
+      --radius-sm:4px; --radius-md:6px; --radius-lg:8px; --radius-xl:12px;
+      --shadow-sm:0 1px 2px rgba(15,23,42,.05);
+      --font-sans:'PingFang SC','Microsoft YaHei','Inter',system-ui,sans-serif;
+      --font-mono:'JetBrains Mono','SF Mono','Menlo','Consolas',monospace;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:var(--font-sans);color:var(--ink-800);background:var(--bg-subtle);font-size:14px;line-height:1.57;-webkit-font-smoothing:antialiased;}
+    .custom-scroll::-webkit-scrollbar{width:6px;height:6px;}
+    .custom-scroll::-webkit-scrollbar-track{background:transparent;}
+    .custom-scroll::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px;}
+    .custom-scroll::-webkit-scrollbar-thumb:hover{background:var(--brand-500);}
+    .font-mono{font-family:var(--font-mono);}
+
+    .top-menu-item{transition:all .2s;cursor:pointer;}
+    .top-menu-item:hover{background:rgba(42,102,194,.06);color:var(--brand-900);}
+    .top-menu-item.active{background:rgba(42,102,194,.1);color:var(--brand-900);box-shadow:0 1px 2px rgba(0,0,0,.05);}
+    .side-menu-item{transition:all .2s;cursor:pointer;border-radius:6px;}
+    .side-menu-item:hover{background:#F1F5F9;color:var(--brand-900);}
+    .side-menu-item.active{background:rgba(42,102,194,.1);color:var(--brand-900);font-weight:500;border-radius:8px;position:relative;}
+    .side-menu-item.active::before{content:'';position:absolute;left:0;top:4px;bottom:4px;width:3px;background:var(--brand-500);border-radius:0 3px 3px 0;}
+
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:var(--radius-md);font-family:inherit;font-weight:500;cursor:pointer;transition:all .15s;border:1px solid transparent;line-height:1;white-space:nowrap;}
+    .btn-sm{padding:6px 12px;font-size:12px;line-height:20px;height:28px;}
+    .btn-md{padding:8px 16px;font-size:14px;line-height:22px;height:32px;}
+    .btn-primary{background:var(--brand-500);color:#fff;} .btn-primary:hover{background:var(--brand-700);}
+    .btn-secondary{background:var(--white);color:var(--ink-800);border-color:var(--ink-300);} .btn-secondary:hover{border-color:var(--brand-500);color:var(--brand-500);} .btn-secondary:disabled{opacity:.5;cursor:not-allowed;}
+
+    .tag{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:var(--radius-sm);font-size:12px;font-weight:500;line-height:1.5;border:1px solid transparent;white-space:nowrap;}
+    .tag-default{background:var(--bg-muted);color:var(--ink-600);border-color:var(--line-200);}
+    .tag-success{background:var(--success-bg);color:var(--green-700);border-color:var(--success-border);}
+    .tag-info{background:var(--info-bg);color:var(--info);border-color:var(--info-border);}
+
+    .section-card{background:var(--white);border-radius:var(--radius-xl);border:1px solid var(--line-200);overflow:visible;box-shadow:var(--shadow-sm);}
+    .table-wrap{position:relative;overflow-x:auto;}
+    .table-wrap table{border-collapse:separate;border-spacing:0;width:100%;}
+    .table-wrap th,.table-wrap td{white-space:nowrap;}
+    .sticky-right{position:sticky;right:0;z-index:10;background:var(--white);border-left:1px solid var(--line-200);}
+    .sticky-right-header{position:sticky;right:0;z-index:20;background:var(--bg-muted);border-left:1px solid var(--line-200);}
+    .data-row{border-bottom:1px solid var(--line-200);transition:background .12s;}
+    .data-row:hover{background:rgba(241,245,249,.6);}
+    .data-row:hover .sticky-right{background:rgba(241,245,249,.9);}
+
+    .filter-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;}
+    .filter-item{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+    .filter-item label{font-size:12px;color:var(--ink-500);font-weight:500;white-space:nowrap;}
+    .filter-item input,.filter-item select{padding:4px 8px;border:1px solid var(--line-200);border-radius:var(--radius-md);font-size:13px;background:var(--white);outline:none;transition:border-color .2s;height:28px;font-family:inherit;color:var(--ink-800);}
+    .filter-item input:focus,.filter-item select:focus{border-color:var(--brand-500);}
+    .filter-item input[type="text"]{min-width:160px;} .filter-item select{min-width:110px;} .filter-item input[type="date"]{min-width:130px;}
+    .filter-actions{display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:4px;}
+    .jump-input{width:48px;padding:2px 4px;border:1px solid var(--ink-300);border-radius:var(--radius-md);text-align:center;font-size:13px;height:28px;outline:none;font-family:inherit;color:var(--ink-800);}
+    .jump-input:focus{border-color:var(--brand-500);}
+  </style>
+</head>
+<body>
+
+    <main class="flex-1 flex flex-col overflow-hidden" style="background:var(--bg-subtle)">
+      <div class="bg-white px-6 py-2 border-b border-gray-200 flex-shrink-0">
+        <button class="btn btn-ghost btn-sm" onclick="goBack()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          返回
+        </button>
+      </div>
+      <div class="flex-1 overflow-y-auto custom-scroll" style="padding:24px">
+        <div class="section-card">
+          <!-- 筛选栏 -->
+          <div style="padding:12px 20px;border-bottom:1px solid var(--line-200);background:var(--bg-subtle)">
+            <div class="filter-row">
+              <div class="filter-item"><label>客户信息</label><input type="text" id="fCust" placeholder="名称/编号/统一社会信用"></div>
+              <div class="filter-item"><label>客户类型</label><select id="fType"><option>全部</option><option>公司</option><option>个人</option></select></div>
+              <div class="filter-item"><label>所属行业</label><select><option>请选择</option></select></div>
+              <div class="filter-item"><label>所属地区</label><select id="fRegion"><option>全部</option><option>青海省西宁市</option><option>青海省海东市</option><option>青海省海南州</option><option>青海省海西州</option><option>青海省海北州</option></select></div>
+              <div class="filter-item"><label>是否存在特色证书/文件</label><select id="fSpecial"><option>全部</option><option>是</option><option>否</option></select></div>
+              <div class="filter-item"><label>最近更新时间</label><input type="date"><span style="color:var(--ink-400);font-size:13px;">~</span><input type="date"></div>
+              <div class="filter-actions"><button class="btn btn-primary btn-sm" onclick="handleSearch()">查询</button><button class="btn btn-secondary btn-sm" onclick="handleReset()">重置</button></div>
+            </div>
+          </div>
+
+          <!-- 操作栏 -->
+          <div class="flex items-center justify-between px-6 py-3 border-b border-slate-100">
+            <div class="flex gap-2"><button class="btn btn-secondary btn-sm" onclick="exportList()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg>导出数据</button></div>
+            <span class="text-sm text-slate-400">共 <span id="cntBar" class="text-slate-600 font-medium">0</span> 条</span>
+          </div>
+
+          <!-- 表格 -->
+          <div class="table-wrap custom-scroll">
+            <table>
+              <thead style="background:var(--bg-muted);border-bottom:1px solid var(--line-200)">
+                <tr>
+                  <th class="px-2 py-2 text-left font-semibold text-slate-600" style="min-width:130px;">客户编号</th>
+                  <th class="px-2 py-2 text-left font-semibold text-slate-600" style="min-width:180px;">客户名称</th>
+                  <th class="px-2 py-2 text-left font-semibold text-slate-600" style="min-width:90px;">证件类型</th>
+                  <th class="px-2 py-2 text-left font-semibold text-slate-600" style="min-width:160px;">证件号</th>
+                  <th class="px-2 py-2 text-left font-semibold text-slate-600" style="min-width:80px;">客户类型</th>
+                  <th class="px-2 py-2 text-left font-semibold text-slate-600" style="min-width:110px;">所属行业</th>
+                  <th class="px-2 py-2 text-left font-semibold text-slate-600" style="min-width:120px;">所属地区</th>
+                  <th class="px-2 py-2 text-left font-semibold text-slate-600" style="min-width:140px;">是否存在特色证书/文件</th>
+                  <th class="px-2 py-2 text-left font-semibold text-slate-600" style="min-width:100px;">数据来源</th>
+                  <th class="px-2 py-2 text-left font-semibold text-slate-600" style="min-width:150px;">最近更新时间</th>
+                  <th class="px-2 py-2 text-center font-semibold text-slate-600 sticky-right-header" style="min-width:96px;border-left:1px solid var(--line-200);">操作</th>
+                </tr>
+              </thead>
+              <tbody id="tbody"></tbody>
+            </table>
+          </div>
+
+          <!-- 分页 -->
+          <div class="flex items-center justify-between px-6 py-3 border-t border-slate-100">
+            <span class="text-sm text-slate-400">共 <span id="cntPage" class="text-slate-600 font-medium">0</span> 条</span>
+            <div class="flex items-center gap-2" id="pagination"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+<script>
+  // ============ 客户基本信息（行内对接：新一代信贷系统推送）============
+  const customers = [
+    { customerId:"C20241002356", name:"青海绿能生态修复有限公司", idType:"营业执照", idNo:"91630000MA******R", custType:"公司", industry:"太阳能发电", region:"青海省海南州", phone:"0974-8512****", addr:"青海省海南州共和县绿源产业园区", scope:"太阳能发电、土壤污染治理与生态修复、有机种植", source:"行内对接", updateTime:"2026-06-20 09:32:18" },
+    { customerId:"C20241008842", name:"海东市祥云农牧科技有限公司", idType:"营业执照", idNo:"91630200MA******K", custType:"公司", industry:"农产品加工", region:"青海省海东市", phone:"0972-8619****", addr:"海东市平安区绿色产业园", scope:"高原夏菜冷链、有机肥加工", source:"行内对接", updateTime:"2026-06-19 16:45:02" },
+    { customerId:"C20241005671", name:"青海三江风电有限公司", idType:"营业执照", idNo:"91632800MA******W", custType:"公司", industry:"风力发电", region:"青海省海西州", phone:"0977-8723****", addr:"海西州德令哈市三江风电基地", scope:"风力发电场建设运营", source:"行内对接", updateTime:"2026-06-18 14:08:30" },
+    { customerId:"C20241006238", name:"西宁瑞景商贸有限公司", idType:"营业执照", idNo:"91630100MA******P", custType:"公司", industry:"批发零售", region:"青海省西宁市", phone:"0971-6132****", addr:"西宁市城西区五四西路", scope:"日用百货批发", source:"行内对接", updateTime:"2026-06-17 11:20:14" },
+    { customerId:"C20241007120", name:"青海湖生态牧业合作社", idType:"营业执照", idNo:"91632200MA******H", custType:"公司", industry:"畜牧业", region:"青海省海北州", phone:"0970-8641****", addr:"海北州海晏县青海湖乡", scope:"牦牛藏羊标准化养殖", source:"行内对接", updateTime:"2026-06-22 08:55:41" },
+    { customerId:"C20241008895", name:"海西绿氢能源科技有限公司", idType:"营业执照", idNo:"91632801MA******L", custType:"公司", industry:"氢能", region:"青海省海西州", phone:"0977-8234****", addr:"海西州德令哈市绿氢产业园", scope:"光伏制氢一体化", source:"行内对接", updateTime:"2026-06-15 09:48:27" },
+    { customerId:"P632521198805******", name:"马占彪", idType:"身份证", idNo:"632521198805******", custType:"个人", industry:"中药材种植", region:"青海省海南州", phone:"139****5621", addr:"青海省海南州共和县恰卜恰镇", scope:"中藏药材种植", source:"行内对接", updateTime:"2026-06-21 10:12:55" },
+    { customerId:"C20241009330", name:"青海盐湖蓝科锂业股份有限公司", idType:"营业执照", idNo:"91632802MA******X", custType:"公司", industry:"化学原料制造", region:"青海省海西州", phone:"0977-8456****", addr:"海西州格尔木市察尔汗盐湖", scope:"盐湖提锂", source:"行内对接", updateTime:"2026-06-22 13:25:18" },
+    { customerId:"C20241010458", name:"祁连山矿泉水开发有限公司", idType:"营业执照", idNo:"91632201MA******M", custType:"公司", industry:"饮料制造", region:"青海省海北州", phone:"0970-8678****", addr:"海北州祁连县八宝镇", scope:"天然矿泉水开采", source:"行内对接", updateTime:"2026-06-14 10:05:50" },
+    { customerId:"C20241120001", name:"青海高原蓝焰蔬菜种植有限公司", idType:"营业执照", idNo:"91630105MA******Q", custType:"公司", industry:"谷物种植", region:"青海省西宁市", phone:"0971-8301****", addr:"西宁市大通县朔山农业园", scope:"高原有机蔬菜种植", source:"行内对接", updateTime:"2026-06-13 15:20:00" },
+    { customerId:"C20241120002", name:"西宁城北环保建材有限公司", idType:"营业执照", idNo:"91630105MA******Y", custType:"公司", industry:"建材", region:"青海省西宁市", phone:"0971-5219****", addr:"西宁市城北区生物园区", scope:"环保建材生产", source:"行内对接", updateTime:"2026-06-12 09:30:11" },
+    { customerId:"P632221197608******", name:"更登多吉", idType:"身份证", idNo:"632221197608******", custType:"个人", industry:"畜牧业", region:"青海省海南州", phone:"138****8842", addr:"青海省海南州同德县河北乡", scope:"藏羊养殖", source:"行内对接", updateTime:"2026-06-11 11:40:33" }
+  ];
+
+  // ============ 企业绿色证书/文件（默认数据，可由编辑页通过 localStorage 更新）============
+  const defaultGreenCerts = {
+    "C20241002356": [
+      { name:"生态修复工程绿色认证证书", type:"证书", no:"ECO-2024-007", issuer:"青海省生态环境厅", start:"2024-05-01", end:"2027-04-30" },
+      { name:"绿色矿山修复方案批复", type:"文件", no:"DOC-2025-021", issuer:"青海省自然资源厅", start:"2025-01-10", end:"2028-01-09" }
+    ],
+    "C20241008842": [
+      { name:"绿色食品标志证书（高原夏菜）", type:"证书", no:"GF-2024-301", issuer:"中国绿色食品发展中心", start:"2024-03-15", end:"2027-03-14" }
+    ],
+    "C20241007120": [
+      { name:"有机畜产品认证证书", type:"证书", no:"ORG-2023-052", issuer:"北京中绿华夏有机食品认证中心", start:"2023-09-01", end:"2026-08-31" }
+    ],
+    "C20241008895": [
+      { name:"光伏制氢绿色示范项目认定文件", type:"文件", no:"DOC-2025-088", issuer:"海西州发展和改革委员会", start:"2025-06-20", end:"2028-06-19" }
+    ],
+    "C20241010458": [
+      { name:"绿色食品标志证书（天然矿泉水）", type:"证书", no:"GF-2023-418", issuer:"中国绿色食品发展中心", start:"2023-11-01", end:"2026-10-31" }
+    ],
+    "C20241120001": [
+      { name:"有机转换认证证书（高原蔬菜）", type:"证书", no:"OTR-2024-015", issuer:"青海绿有机食品认证中心", start:"2024-07-01", end:"2025-06-30" }
+    ]
+  };
+
+  function getCustCerts(id){
+    try { const s = localStorage.getItem("custGreenCerts_"+id); if(s) return JSON.parse(s); } catch(e){}
+    return defaultGreenCerts[id] || [];
+  }
+
+  const PAGE_SIZE=10; let currentPage=1; let filtered=[];
+
+  function val(id){ const el=document.getElementById(id); return el?el.value.trim():''; }
+  function custTypeTag(t){ return t==="公司" ? '<span class="tag tag-info">公司</span>' : '<span class="tag tag-default">个人</span>'; }
+  function greenTag(certs){
+    if(certs.length>0) return '<span class="tag tag-success">是 · '+certs.length+'份</span>';
+    return '<span class="tag tag-default">否</span>';
+  }
+
+  function applyFilters(){
+    const fc=val('fCust').toLowerCase(), ft=val('fType'), fr=val('fRegion'), fg=val('fSpecial');
+    filtered = customers.filter(c=>{
+      if(fc && !(c.name.toLowerCase().includes(fc)||c.customerId.toLowerCase().includes(fc)||c.idNo.toLowerCase().includes(fc))) return false;
+      if(ft && ft!=='全部' && c.custType!==ft) return false;
+      if(fr && fr!=='全部' && c.region!==fr) return false;
+      const has = getCustCerts(c.customerId).length>0;
+      if(fg==='是' && !has) return false;
+      if(fg==='否' && has) return false;
+      return true;
+    });
+    currentPage=1; renderTable();
+  }
+
+  function renderTable(){
+    const total=filtered.length, totalPages=Math.max(1,Math.ceil(total/PAGE_SIZE));
+    if(currentPage>totalPages) currentPage=totalPages;
+    const start=(currentPage-1)*PAGE_SIZE, page=filtered.slice(start,start+PAGE_SIZE);
+    const tb=document.getElementById('tbody');
+    if(page.length===0){
+      tb.innerHTML='<tr class="data-row"><td colspan="11" class="px-2 py-12 text-center" style="color:var(--ink-400)">未找到匹配的客户记录</td></tr>';
+    } else {
+      tb.innerHTML = page.map(c=>{
+        const certs = getCustCerts(c.customerId);
+        return `<tr class="data-row">
+          <td class="px-2 py-2 font-mono" style="color:var(--brand-500);cursor:pointer;" onclick="goEdit('${c.customerId}')">${c.customerId}</td>
+          <td class="px-2 py-2 font-medium" style="color:var(--ink-800);">${c.name}</td>
+          <td class="px-2 py-2" style="color:var(--ink-600);">${c.idType}</td>
+          <td class="px-2 py-2 font-mono" style="font-size:12px;color:var(--ink-600);">${c.idNo}</td>
+          <td class="px-2 py-2">${custTypeTag(c.custType)}</td>
+          <td class="px-2 py-2" style="color:var(--ink-600);">${c.industry}</td>
+          <td class="px-2 py-2" style="color:var(--ink-600);">${c.region}</td>
+          <td class="px-2 py-2">${greenTag(certs)}</td>
+          <td class="px-2 py-2"><span class="tag tag-info">行内对接</span></td>
+          <td class="px-2 py-2 font-mono" style="font-size:11px;color:var(--ink-500);">${c.updateTime}</td>
+          <td class="px-2 py-2 sticky-right" style="text-align:center;"><button class="btn btn-secondary btn-sm" onclick="goEdit('${c.customerId}')">查看详情</button></td>
+        </tr>`;
+      }).join('');
+    }
+    document.getElementById('cntBar').innerText=total;
+    document.getElementById('cntPage').innerText=total;
+    renderPagination(totalPages);
+  }
+
+  function renderPagination(tp){
+    const p=document.getElementById('pagination');
+    let h=`<button class="btn btn-secondary btn-sm" ${currentPage===1?'disabled':''} onclick="goPage(${currentPage-1})">‹</button>`;
+    for(let i=1;i<=tp;i++) h+=`<button class="btn ${i===currentPage?'btn-primary':'btn-secondary'} btn-sm" onclick="goPage(${i})">${i}</button>`;
+    h+=`<button class="btn btn-secondary btn-sm" ${currentPage===tp?'disabled':''} onclick="goPage(${currentPage+1})">›</button>`;
+    h+=`<span class="text-sm text-slate-500 ml-2">跳至 <input type="number" class="jump-input" value="${currentPage}" min="1" max="${tp}" onchange="jump(${tp})"> /${tp}页</span>`;
+    p.innerHTML=h;
+  }
+  function jump(tp){ let n=parseInt(document.querySelector('#pagination .jump-input').value); if(isNaN(n)||n<1)n=1; if(n>tp)n=tp; goPage(n); }
+  function goPage(n){ currentPage=n; renderTable(); }
+  function handleSearch(){ applyFilters(); }
+  function handleReset(){ document.querySelectorAll('.filter-item input[type="text"]').forEach(i=>i.value=''); document.querySelectorAll('.filter-item input[type="date"]').forEach(i=>i.value=''); document.querySelectorAll('.filter-item select').forEach(s=>s.selectedIndex=0); applyFilters(); }
+  function exportList(){ alert('演示功能：导出当前客户列表（共 '+filtered.length+' 条）为 Excel。'); }
+  function goEdit(id){
+    // 兼容 iframe 嵌入场景
+    var targetUrl = '客户管理编辑.html?customerId=' + encodeURIComponent(id);
+    if (window.parent && window.parent !== window) {
+      try { window.parent.location.href = targetUrl; } catch(e) { window.location.href = targetUrl; }
+    } else {
+      window.location.href = targetUrl;
+    }
+  }
+  function goBack(){
+    if (window.parent && window.parent !== window) {
+      try { window.parent.history.back(); } catch(e) { window.history.back(); }
+    } else {
+      window.history.back();
+    }
+  }
+
+  window.onload=()=>{ applyFilters(); };
+</script>
+</body>
+</html>

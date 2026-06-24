@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>操作日志列表 - 青海农信 · 智能识别系统</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --brand-50:#E8F0FB; --brand-100:#D1DFF4; --brand-300:#6E97D6;
+      --brand-500:#2A66C2; --brand-700:#143F8F; --brand-900:#01256A;
+      --green-50:#ECFDF5; --green-500:#10B981; --green-700:#047857;
+      --success:#10B981; --success-bg:#ECFDF5; --success-border:#A7F3D0;
+      --warning:#D97706; --warning-bg:#FFFBEB; --warning-border:#FDE68A;
+      --danger:#DC2626;  --danger-bg:#FEF2F2;  --danger-border:#FECACA;
+      --info:#2A66C2;    --info-bg:#E8F0FB;    --info-border:#D1DFF4;
+      --ink-900:#0F172A; --ink-800:#1E293B; --ink-600:#475569;
+      --ink-500:#64748B; --ink-400:#94A3B8; --ink-300:#CBD5E1;
+      --line-200:#E2E8F0; --bg-muted:#F1F5F9; --bg-subtle:#F8FAFC;
+      --white:#FFFFFF;
+      --radius-sm:4px; --radius-md:6px; --radius-lg:8px;
+      --radius-xl:12px; --radius-2xl:16px;
+      --shadow-lg:0 10px 24px rgba(15,23,42,.10),0 4px 8px rgba(15,23,42,.04);
+      --shadow-xl:0 20px 40px rgba(15,23,42,.16),0 8px 16px rgba(15,23,42,.06);
+      --s-1:4px; --s-2:8px; --s-3:12px; --s-4:16px; --s-5:20px; --s-6:24px; --s-8:32px;
+      --font-sans:'PingFang SC','Microsoft YaHei','Inter',system-ui,sans-serif;
+      --font-num:'Inter','SF Pro Display',system-ui,sans-serif;
+      --font-mono:'JetBrains Mono','SF Mono','Menlo','Consolas',monospace;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:var(--font-sans);color:var(--ink-800);background:var(--bg-subtle);font-size:14px;line-height:1.57;-webkit-font-smoothing:antialiased}
+    .custom-scroll::-webkit-scrollbar{width:6px;height:6px}
+    .custom-scroll::-webkit-scrollbar-track{background:transparent}
+    .custom-scroll::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}
+    .custom-scroll::-webkit-scrollbar-thumb:hover{background:var(--brand-500)}
+
+    /* Tag */
+    .tag{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:var(--radius-sm);font-size:12px;font-weight:500;line-height:1.5;border:1px solid transparent}
+    .tag-default{background:var(--bg-muted);color:var(--ink-600);border-color:var(--line-200)}
+    .tag-brand{background:var(--brand-50);color:var(--brand-700);border-color:var(--brand-100)}
+    .tag-success{background:var(--success-bg);color:var(--green-700);border-color:var(--success-border)}
+    .tag-warning{background:var(--warning-bg);color:var(--warning);border-color:var(--warning-border)}
+    .tag-danger{background:var(--danger-bg);color:var(--danger);border-color:var(--danger-border)}
+    .tag-info{background:var(--info-bg);color:var(--info);border-color:var(--info-border)}
+
+    /* Table */
+    table{width:100%;border-collapse:collapse;font-size:14px;line-height:22px}
+    thead th{background:var(--bg-subtle);color:var(--ink-600);font-weight:500;text-align:left;padding:10px 16px;border-bottom:1px solid var(--line-200);font-size:12px;white-space:nowrap}
+    tbody td{padding:12px 16px;border-bottom:1px solid var(--line-200);color:var(--ink-800);vertical-align:middle}
+    tbody tr:last-child td{border-bottom:none}
+    tbody tr:hover{background:var(--bg-subtle)}
+    .num{font-family:var(--font-num);font-variant-numeric:tabular-nums;text-align:center}
+
+    /* Button */
+    .btn{display:inline-flex;align-items:center;gap:6px;border-radius:var(--radius-md);font-family:inherit;font-weight:500;cursor:pointer;transition:all .15s;border:1px solid transparent;line-height:1;white-space:nowrap}
+    .btn-sm{padding:6px 12px;font-size:12px;line-height:20px;height:28px}
+    .btn-md{padding:8px 16px;font-size:14px;line-height:22px;height:32px}
+    .btn-primary{background:var(--brand-500);color:#fff}
+    .btn-primary:hover{background:var(--brand-700)}
+    .btn-secondary{background:var(--white);color:var(--ink-800);border-color:var(--ink-300)}
+    .btn-secondary:hover{border-color:var(--brand-500);color:var(--brand-500)}
+    .btn-ghost{background:transparent;color:var(--brand-500);border:none;padding:4px 8px;font-size:13px}
+    .btn-ghost:hover{background:var(--brand-50)}
+    .btn svg{width:14px;height:14px;stroke-width:1.75}
+
+    /* Form Controls */
+    .input,.select-native{width:100%;padding:5px 12px;height:32px;font-family:inherit;font-size:14px;line-height:22px;color:var(--ink-900);background:var(--white);border:1px solid var(--ink-300);border-radius:var(--radius-md);transition:border-color .15s,box-shadow .15s;outline:none}
+    .input::placeholder{color:var(--ink-400)}
+    .input:hover,.select-native:hover{border-color:var(--ink-400)}
+    .input:focus,.select-native:focus{border-color:var(--brand-500);box-shadow:0 0 0 3px rgba(42,102,194,.12)}
+    .select-native{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:32px;cursor:pointer}
+
+    /* Pagination */
+    .pagination{display:flex;align-items:center;gap:var(--s-3);padding:var(--s-3) var(--s-4);border-top:1px solid var(--line-200);background:var(--white);font-size:14px;line-height:22px;color:var(--ink-600)}
+    .pagination-info{font-family:var(--font-num)}
+    .pagination-controls{margin-left:auto;display:flex;gap:4px;align-items:center}
+    .page-btn{min-width:32px;height:32px;padding:0 8px;border:1px solid var(--line-200);background:var(--white);border-radius:var(--radius-md);font-size:14px;color:var(--ink-800);cursor:pointer;font-family:var(--font-num);display:inline-flex;align-items:center;justify-content:center;transition:all .15s}
+    .page-btn:hover:not(:disabled){border-color:var(--brand-500);color:var(--brand-500)}
+    .page-btn.active{background:var(--brand-500);border-color:var(--brand-500);color:#fff}
+    .page-btn:disabled{color:var(--ink-300);cursor:not-allowed;background:var(--bg-muted)}
+
+    /* Section card */
+    .section-card{background:var(--white);border-radius:var(--radius-xl);border:1px solid var(--line-200);overflow:hidden}
+  </style>
+</head>
+<body>
+
+<main style="background:var(--bg-subtle);min-height:100vh">
+  <div style="padding:var(--s-6);max-width:1400px;margin:0 auto">
+
+    <!-- Filter -->
+    <div class="section-card" style="margin-bottom:var(--s-4)">
+      <div style="padding:var(--s-4)">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s-4);align-items:end">
+          <!-- 操作人 -->
+          <div>
+            <label style="font-size:14px;color:var(--ink-700);font-weight:500;margin-bottom:6px;display:block">操作人</label>
+            <input type="text" class="input" placeholder="请输入操作人姓名" id="filterUser">
+          </div>
+          <!-- 操作类型 -->
+          <div>
+            <label style="font-size:14px;color:var(--ink-700);font-weight:500;margin-bottom:6px;display:block">操作类型</label>
+            <select class="select-native" id="filterType">
+              <option value="">全部</option>
+              <option value="登录">登录</option>
+              <option value="查询">查询</option>
+              <option value="新增">新增</option>
+              <option value="修改">修改</option>
+              <option value="删除">删除</option>
+              <option value="导出">导出</option>
+            </select>
+          </div>
+          <!-- 操作时间 -->
+          <div>
+            <label style="font-size:14px;color:var(--ink-700);font-weight:500;margin-bottom:6px;display:block">操作时间</label>
+            <div style="display:flex;align-items:center;gap:8px">
+              <input type="date" class="input" id="filterTimeFrom" style="flex:1">
+              <span style="color:var(--ink-400);flex-shrink:0">~</span>
+              <input type="date" class="input" id="filterTimeTo" style="flex:1">
+            </div>
+          </div>
+          <!-- 操作结果 -->
+          <div>
+            <label style="font-size:14px;color:var(--ink-700);font-weight:500;margin-bottom:6px;display:block">操作结果</label>
+            <select class="select-native" id="filterResult">
+              <option value="">全部</option>
+              <option value="成功">成功</option>
+              <option value="失败">失败</option>
+            </select>
+          </div>
+        </div>
+        <!-- Buttons -->
+        <div style="display:flex;gap:var(--s-3);margin-top:var(--s-4);justify-content:flex-end">
+          <button class="btn btn-primary btn-md" onclick="handleSearch()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            查询
+          </button>
+          <button class="btn btn-secondary btn-md" onclick="handleReset()">重置</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="section-card">
+      <!-- Toolbar -->
+      <div style="display:flex;align-items:center;gap:var(--s-2);padding:var(--s-3) var(--s-4);border-bottom:1px solid var(--line-200)">
+        <span style="font-size:16px;font-weight:600;color:var(--ink-900)">操作日志列表</span>
+        <span style="margin-left:auto;font-size:12px;color:var(--ink-500)">共 <strong id="totalCount" style="color:var(--brand-500);font-family:var(--font-num)">56</strong> 条</span>
+      </div>
+      <div style="overflow-x:auto" class="custom-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:60px;text-align:center">序号</th>
+              <th style="width:90px">操作人</th>
+              <th style="width:140px">所属机构</th>
+              <th style="width:80px">操作类型</th>
+              <th style="min-width:200px">操作描述</th>
+              <th style="width:130px">IP地址</th>
+              <th style="width:170px">操作时间</th>
+              <th style="width:80px">操作结果</th>
+            </tr>
+          </thead>
+          <tbody id="logTableBody">
+          </tbody>
+        </table>
+      </div>
+      <!-- Pagination -->
+      <div class="pagination" id="paginationBar">
+        <span class="pagination-info">共 <strong id="pageTotal">56</strong> 条</span>
+        <div class="pagination-controls" id="paginationControls">
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;margin-left:16px">
+          <span style="font-size:13px;color:var(--ink-500)">每页</span>
+          <select class="select-native" style="width:auto;height:32px;padding:0 28px 0 10px" id="pageSizeSelect" onchange="changePageSize(this.value)">
+            <option value="20" selected>20</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+          <span style="font-size:13px;color:var(--ink-500)">条</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+// ============ Mock Data ============
+var allLogs = [
+  { user:'李明轩', org:'青海省联社', type:'登录', desc:'用户登录系统', ip:'10.128.1.25', time:'2026-06-24 08:32:15', result:'成功' },
+  { user:'王海东', org:'西宁农商行', type:'查询', desc:'查询绿色信贷项目列表，筛选条件：2026年第二季度', ip:'10.128.2.88', time:'2026-06-24 09:15:42', result:'成功' },
+  { user:'张晓芳', org:'海东农商行', type:'新增', desc:'新增涉农贷款识别记录：农户张三小额信用贷款', ip:'10.128.3.56', time:'2026-06-24 09:28:10', result:'成功' },
+  { user:'马文斌', org:'海南州联社', type:'修改', desc:'修改贷款识别认定结果：合同号 QH-2026-0521 从"未认定"改为"已认定"', ip:'10.128.4.112', time:'2026-06-24 09:45:33', result:'成功' },
+  { user:'陈雪梅', org:'青海省联社', type:'导出', desc:'导出涉农涉绿识别统计报表，时间范围：2026-05-01 至 2026-06-24', ip:'10.128.1.30', time:'2026-06-24 10:02:18', result:'成功' },
+  { user:'杨志强', org:'海北州联社', type:'查询', desc:'查询地方特色产业证书列表，产业类型：高原农牧业', ip:'10.128.5.77', time:'2026-06-24 10:18:55', result:'成功' },
+  { user:'刘建国', org:'黄南州联社', type:'删除', desc:'删除无效客户记录：客户编号 CUST-2023-0042', ip:'10.128.6.43', time:'2026-06-23 16:45:20', result:'成功' },
+  { user:'赵丽华', org:'果洛州联社', type:'登录', desc:'用户登录系统', ip:'10.128.7.15', time:'2026-06-23 15:30:08', result:'成功' },
+  { user:'孙国栋', org:'玉树州联社', type:'修改', desc:'修改客户管理信息：客户名称 玉树牧业合作社 联系人信息更新', ip:'10.128.8.91', time:'2026-06-23 14:22:37', result:'成功' },
+  { user:'何玉兰', org:'海西州联社', type:'新增', desc:'新增地方特色证书：柴达木枸杞有机认证', ip:'10.128.9.64', time:'2026-06-23 11:58:44', result:'成功' },
+  { user:'周建华', org:'西宁农商行', type:'查询', desc:'查询贷款智能识别历史记录，按机构汇总', ip:'10.128.2.105', time:'2026-06-23 10:35:12', result:'成功' },
+  { user:'吴晓峰', org:'青海省联社', type:'修改', desc:'修改角色权限配置：角色"绿色认定专员"增加数据导出权限', ip:'10.128.1.42', time:'2026-06-23 09:48:29', result:'成功' },
+  { user:'李雪莲', org:'海东农商行', type:'登录', desc:'用户登录系统', ip:'10.128.3.78', time:'2026-06-23 08:20:05', result:'成功' },
+  { user:'马海龙', org:'海南州联社', type:'新增', desc:'批量新增涉农认定记录，共导入 156 条', ip:'10.128.4.88', time:'2026-06-22 17:30:11', result:'成功' },
+  { user:'韩涛', org:'青海省联社', type:'导出', desc:'导出操作日志报表，时间范围：2026-01-01 至 2026-06-22', ip:'10.128.1.18', time:'2026-06-22 16:15:48', result:'成功' },
+  { user:'田秀英', org:'海北州联社', type:'删除', desc:'删除重复地方特色证书记录：证书编号 LC-2025-0188', ip:'10.128.5.122', time:'2026-06-22 15:08:33', result:'失败' },
+  { user:'郭建军', org:'黄南州联社', type:'查询', desc:'查询客户管理列表，按所属机构筛选', ip:'10.128.6.55', time:'2026-06-22 14:42:16', result:'成功' },
+  { user:'马丽萍', org:'果洛州联社', type:'修改', desc:'修改机构信息：果洛州联社 联系电话变更', ip:'10.128.7.31', time:'2026-06-22 11:20:54', result:'成功' },
+  { user:'赵鹏飞', org:'玉树州联社', type:'登录', desc:'用户登录系统', ip:'10.128.8.67', time:'2026-06-22 10:05:39', result:'成功' },
+  { user:'林晓燕', org:'海西州联社', type:'查询', desc:'查询统计分析-涉农涉绿识别趋势数据', ip:'10.128.9.45', time:'2026-06-22 09:38:22', result:'成功' },
+  { user:'李明轩', org:'青海省联社', type:'修改', desc:'修改系统参数配置：绿色认定自动审核阈值从80%调整为85%', ip:'10.128.1.25', time:'2026-06-21 16:55:08', result:'成功' },
+  { user:'王海东', org:'西宁农商行', type:'新增', desc:'新增绿色信贷项目：西宁城市轨道交通绿色债券', ip:'10.128.2.88', time:'2026-06-21 15:12:45', result:'成功' },
+  { user:'张晓芳', org:'海东农商行', type:'删除', desc:'删除无效贷款识别记录：识别编号 QH-2024-0012', ip:'10.128.3.56', time:'2026-06-21 14:28:31', result:'成功' },
+  { user:'陈雪梅', org:'青海省联社', type:'登录', desc:'用户登录系统', ip:'10.128.1.30', time:'2026-06-21 13:40:17', result:'成功' },
+  { user:'杨志强', org:'海北州联社', type:'导出', desc:'导出地方特色产业统计数据', ip:'10.128.5.77', time:'2026-06-21 11:25:49', result:'成功' },
+  { user:'马文斌', org:'海南州联社', type:'查询', desc:'查询数据字典-字典管理，搜索"贷款分类"', ip:'10.128.4.112', time:'2026-06-21 10:08:35', result:'成功' },
+  { user:'刘建国', org:'黄南州联社', type:'登录', desc:'用户登录系统', ip:'10.128.6.43', time:'2026-06-20 17:55:21', result:'失败' },
+  { user:'赵丽华', org:'果洛州联社', type:'修改', desc:'修改贷款智能识别规则参数', ip:'10.128.7.15', time:'2026-06-20 16:32:14', result:'成功' },
+  { user:'孙国栋', org:'玉树州联社', type:'查询', desc:'查询机构管理-机构树完整层级数据', ip:'10.128.8.91', time:'2026-06-20 15:18:52', result:'成功' },
+  { user:'何玉兰', org:'海西州联社', type:'新增', desc:'新增青海特色产业维护记录：冬虫夏草产地认证', ip:'10.128.9.64', time:'2026-06-20 14:05:38', result:'成功' },
+  { user:'周建华', org:'西宁农商行', type:'导出', desc:'导出客户管理列表数据', ip:'10.128.2.105', time:'2026-06-20 11:42:16', result:'成功' },
+  { user:'吴晓峰', org:'青海省联社', type:'删除', desc:'删除过期角色：角色"临时审核员"已无关联用户', ip:'10.128.1.42', time:'2026-06-20 10:28:55', result:'成功' },
+  { user:'李雪莲', org:'海东农商行', type:'查询', desc:'查询贷款识别数据分析-按机构维度统计', ip:'10.128.3.78', time:'2026-06-20 09:15:30', result:'成功' },
+  { user:'马海龙', org:'海南州联社', type:'登录', desc:'用户登录系统', ip:'10.128.4.88', time:'2026-06-19 17:48:12', result:'成功' },
+  { user:'韩涛', org:'青海省联社', type:'修改', desc:'修改用户管理：用户"张明辉"所属机构从"总行"调整为"西宁农商行"', ip:'10.128.1.18', time:'2026-06-19 16:22:47', result:'成功' },
+  { user:'田秀英', org:'海北州联社', type:'新增', desc:'新增客户管理记录：青海湖生态旅游开发公司', ip:'10.128.5.122', time:'2026-06-19 15:08:35', result:'成功' },
+  { user:'郭建军', org:'黄南州联社', type:'导出', desc:'导出涉农涉绿识别明细数据', ip:'10.128.6.55', time:'2026-06-19 14:35:19', result:'成功' },
+  { user:'马丽萍', org:'果洛州联社', type:'查询', desc:'查询角色管理-角色列表，筛选"审批人"', ip:'10.128.7.31', time:'2026-06-19 11:20:58', result:'成功' },
+  { user:'赵鹏飞', org:'玉树州联社', type:'修改', desc:'修改客户特色证书维护：证书有效期延长至2027年', ip:'10.128.8.67', time:'2026-06-19 10:05:42', result:'失败' },
+  { user:'林晓燕', org:'海西州联社', type:'登录', desc:'用户登录系统', ip:'10.128.9.45', time:'2026-06-19 08:50:26', result:'成功' },
+  { user:'李明轩', org:'青海省联社', type:'查询', desc:'查询操作日志列表，全量数据', ip:'10.128.1.25', time:'2026-06-18 17:30:11', result:'成功' },
+  { user:'王海东', org:'西宁农商行', type:'修改', desc:'修改贷款智能识别列表中合同 QH-2026-0488 的绿色分类', ip:'10.128.2.88', time:'2026-06-18 16:15:54', result:'成功' },
+  { user:'张晓芳', org:'海东农商行', type:'登录', desc:'用户登录系统', ip:'10.128.3.56', time:'2026-06-18 15:08:33', result:'成功' },
+  { user:'陈雪梅', org:'青海省联社', type:'新增', desc:'新增数据字典条目：贷款用途分类-绿色建筑', ip:'10.128.1.30', time:'2026-06-18 14:42:18', result:'成功' },
+  { user:'杨志强', org:'海北州联社', type:'删除', desc:'删除过期客户特色证书：证书编号 LC-2024-0056', ip:'10.128.5.77', time:'2026-06-18 11:28:45', result:'成功' },
+  { user:'马文斌', org:'海南州联社', type:'查询', desc:'查询地方特色证书维护列表，按产业类型筛选：清洁能源', ip:'10.128.4.112', time:'2026-06-18 10:15:22', result:'成功' },
+  { user:'刘建国', org:'黄南州联社', type:'导出', desc:'导出用户管理列表数据', ip:'10.128.6.43', time:'2026-06-18 09:38:55', result:'成功' },
+  { user:'赵丽华', org:'果洛州联社', type:'登录', desc:'用户登录系统', ip:'10.128.7.15', time:'2026-06-17 17:22:40', result:'成功' },
+  { user:'孙国栋', org:'玉树州联社', type:'新增', desc:'批量导入地方特色证书数据，共导入 42 条', ip:'10.128.8.91', time:'2026-06-17 16:08:27', result:'成功' },
+  { user:'何玉兰', org:'海西州联社', type:'查询', desc:'查询客户管理列表，搜索"合作"', ip:'10.128.9.64', time:'2026-06-17 15:35:12', result:'成功' },
+  { user:'周建华', org:'西宁农商行', type:'修改', desc:'修改机构管理：西宁农商行下属网点名称变更', ip:'10.128.2.105', time:'2026-06-17 14:18:36', result:'成功' },
+  { user:'吴晓峰', org:'青海省联社', type:'查询', desc:'查询统计分析-贷款识别数据分析报表', ip:'10.128.1.42', time:'2026-06-17 11:45:21', result:'成功' },
+  { user:'李雪莲', org:'海东农商行', type:'导出', desc:'导出角色管理列表数据', ip:'10.128.3.78', time:'2026-06-17 10:22:14', result:'成功' },
+  { user:'马海龙', org:'海南州联社', type:'修改', desc:'修改数据字典条目：贷款状态枚举值新增"待补充材料"', ip:'10.128.4.88', time:'2026-06-17 09:08:55', result:'成功' },
+  { user:'韩涛', org:'青海省联社', type:'登录', desc:'用户登录系统', ip:'10.128.1.18', time:'2026-06-16 17:55:33', result:'成功' },
+  { user:'田秀英', org:'海北州联社', type:'查询', desc:'查询操作日志列表，筛选操作类型：删除', ip:'10.128.5.122', time:'2026-06-16 16:30:18', result:'成功' }
+];
+
+// ============ Tag Mapping ============
+var typeTagMap = {
+  '登录': '<span class="tag tag-success">登录</span>',
+  '查询': '<span class="tag tag-info">查询</span>',
+  '新增': '<span class="tag tag-brand">新增</span>',
+  '修改': '<span class="tag tag-warning">修改</span>',
+  '删除': '<span class="tag tag-danger">删除</span>',
+  '导出': '<span class="tag tag-default">导出</span>'
+};
+
+var resultTagMap = {
+  '成功': '<span class="tag tag-success">成功</span>',
+  '失败': '<span class="tag tag-danger">失败</span>'
+};
+
+// ============ State ============
+var currentPage = 1;
+var pageSize = 20;
+var filteredLogs = allLogs.slice();
+
+// ============ Render Table ============
+function renderTable() {
+  var tbody = document.getElementById('logTableBody');
+  var start = (currentPage - 1) * pageSize;
+  var end = Math.min(start + pageSize, filteredLogs.length);
+  var pageLogs = filteredLogs.slice(start, end);
+  var html = '';
+  pageLogs.forEach(function(log, i) {
+    html += '<tr>'
+      + '<td class="num" style="color:var(--ink-500)">' + (start + i + 1) + '</td>'
+      + '<td style="font-weight:500">' + escapeHtml(log.user) + '</td>'
+      + '<td>' + escapeHtml(log.org) + '</td>'
+      + '<td>' + (typeTagMap[log.type] || '<span class="tag tag-default">' + log.type + '</span>') + '</td>'
+      + '<td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + escapeHtml(log.desc) + '">' + escapeHtml(log.desc) + '</td>'
+      + '<td style="font-family:var(--font-mono);font-size:13px;color:var(--ink-600)">' + escapeHtml(log.ip) + '</td>'
+      + '<td style="font-family:var(--font-mono);font-size:13px;white-space:nowrap">' + escapeHtml(log.time) + '</td>'
+      + '<td>' + (resultTagMap[log.result] || '<span class="tag tag-default">' + log.result + '</span>') + '</td>'
+      + '</tr>';
+  });
+  tbody.innerHTML = html;
+  document.getElementById('totalCount').textContent = filteredLogs.length;
+  document.getElementById('pageTotal').textContent = filteredLogs.length;
+  renderPagination();
+}
+
+function renderPagination() {
+  var totalPages = Math.ceil(filteredLogs.length / pageSize);
+  if (totalPages < 1) totalPages = 1;
+  var controls = document.getElementById('paginationControls');
+  var html = '';
+  html += '<button class="page-btn" ' + (currentPage <= 1 ? 'disabled' : '') + ' onclick="changePage(-1)">'
+    + '<svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>';
+  for (var p = 1; p <= totalPages; p++) {
+    if (totalPages > 7 && p > 3 && p < totalPages - 1 && Math.abs(p - currentPage) > 1) {
+      if (p === 4 || p === totalPages - 2) html += '<span class="page-btn" style="border:none;cursor:default;color:var(--ink-400)">...</span>';
+      continue;
+    }
+    html += '<button class="page-btn' + (p === currentPage ? ' active' : '') + '" onclick="goToPage(' + p + ')">' + p + '</button>';
+  }
+  html += '<button class="page-btn" ' + (currentPage >= totalPages ? 'disabled' : '') + ' onclick="changePage(1)">'
+    + '<svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button>';
+  controls.innerHTML = html;
+}
+
+function goToPage(p) {
+  currentPage = p;
+  renderTable();
+}
+
+function changePage(delta) {
+  var totalPages = Math.ceil(filteredLogs.length / pageSize);
+  var newPage = currentPage + delta;
+  if (newPage >= 1 && newPage <= totalPages) {
+    currentPage = newPage;
+    renderTable();
+  }
+}
+
+function changePageSize(val) {
+  pageSize = parseInt(val);
+  currentPage = 1;
+  renderTable();
+}
+
+// ============ Filter ============
+function handleSearch() {
+  var userFilter = document.getElementById('filterUser').value.trim().toLowerCase();
+  var typeFilter = document.getElementById('filterType').value;
+  var timeFrom = document.getElementById('filterTimeFrom').value;
+  var timeTo = document.getElementById('filterTimeTo').value;
+  var resultFilter = document.getElementById('filterResult').value;
+
+  filteredLogs = allLogs.filter(function(log) {
+    if (userFilter && log.user.toLowerCase().indexOf(userFilter) === -1) return false;
+    if (typeFilter && log.type !== typeFilter) return false;
+    if (timeFrom && log.time < timeFrom + ' 00:00:00') return false;
+    if (timeTo && log.time > timeTo + ' 23:59:59') return false;
+    if (resultFilter && log.result !== resultFilter) return false;
+    return true;
+  });
+
+  currentPage = 1;
+  renderTable();
+}
+
+function handleReset() {
+  document.getElementById('filterUser').value = '';
+  document.getElementById('filterType').value = '';
+  document.getElementById('filterTimeFrom').value = '';
+  document.getElementById('filterTimeTo').value = '';
+  document.getElementById('filterResult').value = '';
+  filteredLogs = allLogs.slice();
+  currentPage = 1;
+  renderTable();
+}
+
+// ============ Utils ============
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/[&<>]/g, function(m) {
+    if (m === '&') return '&amp;';
+    if (m === '<') return '&lt;';
+    if (m === '>') return '&gt;';
+    return m;
+  });
+}
+
+// ============ Init ============
+renderTable();
+</script>
+
+</body>
+</html>

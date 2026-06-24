@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd \"c:/刘立丹/产品组/项目/青海省联社/原型.html\" && mkdir -p 01loan-business-analysis 02loan-smart-identify 03local-features 04system-management)",
+      "Bash(node \"c:/刘立丹/产品组/项目/青海省联社/原型.html/strip-nav.js\")"
+    ],
+    "additionalDirectories": [
+      "c:\\刘立丹\\产品组\\项目\\青海省联社\\原型.html"
+    ]
+  }
+}

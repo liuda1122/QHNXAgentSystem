@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>贷款智能识别列表 | 青海农信</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --brand-50:#E8F0FB; --brand-100:#D1DFF4; --brand-300:#6E97D6;
+      --brand-500:#2A66C2; --brand-700:#143F8F; --brand-900:#01256A;
+      --green-50:#ECFDF5; --green-500:#10B981; --green-700:#047857;
+      --success:#10B981; --success-bg:#ECFDF5; --success-border:#A7F3D0;
+      --warning:#D97706; --warning-bg:#FFFBEB; --warning-border:#FDE68A;
+      --danger:#DC2626;  --danger-bg:#FEF2F2;  --danger-border:#FECACA;
+      --info:#2A66C2;    --info-bg:#E8F0FB;    --info-border:#D1DFF4;
+      --ink-900:#0F172A; --ink-800:#1E293B; --ink-700:#334155; --ink-600:#475569;
+      --ink-500:#64748B; --ink-400:#94A3B8; --ink-300:#CBD5E1;
+      --line-200:#E2E8F0; --bg-muted:#F1F5F9; --bg-subtle:#F8FAFC;
+      --white:#FFFFFF;
+      --radius-sm:4px; --radius-md:6px; --radius-lg:8px;
+      --radius-xl:12px; --radius-2xl:16px;
+      --shadow-sm:0 1px 2px rgba(15,23,42,.05);
+      --s-1:4px; --s-2:8px; --s-3:12px; --s-4:16px; --s-5:20px; --s-6:24px; --s-8:32px;
+      --font-sans:'PingFang SC','Microsoft YaHei','Inter',system-ui,sans-serif;
+      --font-num:'Inter','SF Pro Display',system-ui,sans-serif;
+      --font-mono:'JetBrains Mono','SF Mono','Menlo','Consolas',monospace;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:var(--font-sans);color:var(--ink-800);background:var(--bg-subtle);font-size:14px;line-height:1.57;-webkit-font-smoothing:antialiased}
+    .custom-scroll::-webkit-scrollbar{width:6px;height:6px}
+    .custom-scroll::-webkit-scrollbar-track{background:transparent}
+    .custom-scroll::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}
+    .custom-scroll::-webkit-scrollbar-thumb:hover{background:var(--brand-500)}
+
+    .font-mono{font-family:var(--font-mono)}
+    .font-num{font-family:var(--font-num)}
+    .text-brand{color:var(--brand-500)}
+
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:var(--radius-md);font-family:inherit;font-weight:500;cursor:pointer;transition:all .15s;border:1px solid transparent;line-height:1;white-space:nowrap}
+    .btn-sm{padding:6px 12px;font-size:12px;line-height:20px;height:28px}
+    .btn-md{padding:8px 16px;font-size:14px;line-height:22px;height:32px}
+    .btn-primary{background:var(--brand-500);color:#fff}
+    .btn-primary:hover{background:var(--brand-700)}
+    .btn-secondary{background:var(--white);color:var(--ink-800);border-color:var(--ink-300)}
+    .btn-secondary:hover{border-color:var(--brand-500);color:var(--brand-500)}
+    .btn-secondary:disabled{opacity:.5;cursor:not-allowed}
+    .btn svg{width:14px;height:14px;stroke-width:1.75}
+
+    .tag{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:var(--radius-sm);font-size:12px;font-weight:500;line-height:1.5;border:1px solid transparent;white-space:nowrap}
+    .tag-default{background:var(--bg-muted);color:var(--ink-600);border-color:var(--line-200)}
+    .tag-success{background:var(--success-bg);color:var(--green-700);border-color:var(--success-border)}
+    .tag-danger{background:var(--danger-bg);color:var(--danger);border-color:var(--danger-border)}
+    .tag-warning{background:var(--warning-bg);color:var(--warning);border-color:var(--warning-border)}
+    .tag-info{background:var(--info-bg);color:var(--info);border-color:var(--info-border)}
+    .tag-brand{background:var(--brand-50);color:var(--brand-700);border-color:var(--brand-100)}
+
+    .section-card{background:var(--white);border-radius:var(--radius-xl);border:1px solid var(--line-200);overflow:visible;box-shadow:var(--shadow-sm)}
+
+    /* table with frozen right column */
+    .table-wrap{position:relative;overflow-x:auto;padding:0 16px}
+    .table-wrap table{border-collapse:separate;border-spacing:0;width:100%}
+    .table-wrap th,.table-wrap td{white-space:nowrap}
+    .sticky-right{position:sticky;right:0;z-index:10;background:var(--white);border-left:1px solid var(--line-200)}
+    .sticky-right-header{position:sticky;right:0;z-index:20;background:var(--bg-muted);border-left:1px solid var(--line-200)}
+    .data-row{border-bottom:1px solid var(--line-200);transition:background .12s}
+    .data-row:hover{background:rgba(241,245,249,.6)}
+    .data-row:hover .sticky-right{background:rgba(241,245,249,.9)}
+
+    /* filter bar - horizontal */
+    .filter-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px}
+    .filter-item{display:flex;align-items:center;gap:6px;flex-shrink:0}
+    .filter-item label{font-size:12px;color:var(--ink-500);font-weight:500;white-space:nowrap}
+    .filter-item input,.filter-item select{padding:4px 8px;border:1px solid var(--line-200);border-radius:var(--radius-md);font-size:13px;background:var(--white);outline:none;transition:border-color .2s;height:28px;font-family:inherit;color:var(--ink-800)}
+    .filter-item input:focus,.filter-item select:focus{border-color:var(--brand-500)}
+    .filter-item input[type="text"]{min-width:130px}
+    .filter-item select{min-width:100px}
+    .filter-item input[type="date"]{min-width:130px}
+    .filter-actions{display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:4px}
+
+    .jump-input{width:48px;padding:2px 4px;border:1px solid var(--ink-300);border-radius:var(--radius-md);text-align:center;font-size:13px;height:28px;outline:none;font-family:inherit;color:var(--ink-800)}
+    .jump-input:focus{border-color:var(--brand-500)}
+
+    /* dev note */
+    .dev-note-container{
+      background:linear-gradient(135deg,#F0F4FF 0%,#E8F4F0 100%);
+      border:2px dashed var(--brand-500);
+      border-radius:var(--radius-xl);
+      padding:16px 20px;
+      margin:16px;
+      position:relative;
+    }
+    .dev-note-container::before{
+      content:'\01F527 \5907\6CE8';
+      position:absolute;
+      top:-12px;
+      left:20px;
+      background:var(--white);
+      padding:0 12px;
+      font-size:13px;
+      font-weight:700;
+      color:var(--brand-700);
+      border-radius:20px;
+      letter-spacing:0.5px;
+    }
+    .dev-note-container .note-body{font-size:13px;line-height:1.8;color:var(--ink-700);padding-top:6px}
+    .dev-note-container .note-body strong{color:var(--brand-700);font-weight:600}
+
+    /* page */
+    .page-btn{min-width:32px;height:28px;padding:0 8px;border:1px solid var(--line-200);background:var(--white);border-radius:var(--radius-md);font-size:13px;color:var(--ink-800);cursor:pointer;font-family:var(--font-num);display:inline-flex;align-items:center;justify-content:center;transition:all .15s}
+    .page-btn:hover:not(:disabled):not(.active){border-color:var(--brand-500);color:var(--brand-500)}
+    .page-btn.active{background:var(--brand-500);border-color:var(--brand-500);color:#fff}
+    .page-btn:disabled{color:var(--ink-300);cursor:not-allowed;background:var(--bg-muted)}
+  </style>
+</head>
+<body>
+
+  <main class="flex-1 flex flex-col overflow-hidden" style="background:var(--bg-subtle)">
+    <div class="flex-1 overflow-y-auto custom-scroll" style="padding:var(--s-6)">
+      <div class="section-card">
+
+        <!-- 筛选栏 - 水平布局 -->
+        <div style="padding:12px 20px;border-bottom:1px solid var(--line-200);background:var(--bg-subtle)">
+          <div class="filter-row">
+            <div class="filter-item">
+              <label>合同信息</label>
+              <input type="text" id="filterContract" placeholder="合同编号/项目代码">
+            </div>
+            <div class="filter-item">
+              <label>客户信息</label>
+              <input type="text" id="filterCustomer" placeholder="客户名称/编号">
+            </div>
+            <div class="filter-item">
+              <label>贷款投向行业</label>
+              <select id="filterIndustry">
+                <option>全部</option>
+                <option>农林牧渔业</option>
+                <option>制造业</option>
+                <option>电力、热力、燃气及水生产和供应业</option>
+                <option>建筑业</option>
+                <option>批发和零售业</option>
+                <option>交通运输、仓储和邮政业</option>
+                <option>住宿和餐饮业</option>
+                <option>采矿业</option>
+              </select>
+            </div>
+            <div class="filter-item">
+              <label>业务品种</label>
+              <select id="filterBizType">
+                <option>全部</option>
+                <option>项目融资</option>
+                <option>流动资金贷款</option>
+                <option>固定资产贷款</option>
+                <option>经营性贷款</option>
+                <option>消费贷款</option>
+              </select>
+            </div>
+            <div class="filter-item">
+              <label>业务条线</label>
+              <select id="filterBizLine">
+                <option>全部</option>
+                <option>对公贷款</option>
+                <option>个人贷款</option>
+                <option>涉农贷款</option>
+              </select>
+            </div>
+            <div class="filter-item">
+              <label>所属分支机构</label>
+              <select id="filterOrg">
+                <option>全部</option>
+                <option>西宁农商行</option>
+                <option>海东农商行</option>
+                <option>海南州农商行</option>
+                <option>海西州农商行</option>
+                <option>海北州农商行</option>
+                <option>黄南州农商行</option>
+                <option>果洛农商行</option>
+                <option>玉树农商行</option>
+                <option>互助县联社</option>
+              </select>
+            </div>
+            <div class="filter-item">
+              <label>管户人</label>
+              <input type="text" id="filterManager" placeholder="姓名">
+            </div>
+            <div class="filter-item">
+              <label>合同类型</label>
+              <select id="filterContractType">
+                <option>全部</option>
+                <option>项目类</option>
+                <option>非项目类</option>
+              </select>
+            </div>
+            <div class="filter-item">
+              <label>信贷系统识别状态</label>
+              <select id="filterStatus">
+                <option>全部</option>
+                <option>已识别</option>
+                <option>未识别</option>
+                <option>-</option>
+              </select>
+            </div>
+            <div class="filter-item">
+              <label>信贷系统涉农识别结果</label>
+              <select id="filterAgri">
+                <option>全部</option>
+                <option>农林牧渔业贷款</option>
+                <option>农户贷款</option>
+                <option>农村非金融企业及机关团体贷款</option>
+                <option>城市非金融企业及机关团体涉农贷款</option>
+                <option>非涉农</option>
+              </select>
+            </div>
+            <div class="filter-item">
+              <label>信贷系统涉绿识别结果</label>
+              <select id="filterGreen">
+                <option>全部</option>
+                <option>绿色</option>
+                <option>非绿</option>
+              </select>
+            </div>
+            <div class="filter-item">
+              <label>最近更新时间</label>
+              <input type="date" id="filterDateFrom">
+              <span style="color:var(--ink-400);font-size:13px">~</span>
+              <input type="date" id="filterDateTo">
+            </div>
+            <div class="filter-actions">
+              <button class="btn btn-primary btn-sm" onclick="handleSearch()">查询</button>
+              <button class="btn btn-secondary btn-sm" onclick="handleReset()">重置</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 操作栏 -->
+        <div class="flex items-center justify-between px-6 py-3 border-b border-slate-100">
+          <div class="flex gap-2">
+            <button class="btn btn-secondary btn-sm" onclick="exportList()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg>
+              导出数据
+            </button>
+          </div>
+          <span class="text-sm text-slate-400">共 <span id="totalCountBar" class="text-slate-600 font-medium">0</span> 条</span>
+        </div>
+
+        <!-- 表格 -->
+        <div class="table-wrap custom-scroll">
+          <table>
+            <thead style="background:var(--bg-muted);border-bottom:1px solid var(--line-200)">
+              <tr>
+                <th class="px-2 py-2 text-left font-semibold text-slate-600" style="min-width:140px">合同编号</th>
+                <th class="px-2 py-2 text-left font-semibold text-slate-600" style="min-width:110px">业务品种大类</th>
+                <th class="px-2 py-2 text-left font-semibold text-slate-600" style="min-width:110px">业务品种</th>
+                <th class="px-2 py-2 text-right font-semibold text-slate-600" style="min-width:110px">合同金额(万元)</th>
+                <th class="px-2 py-2 text-right font-semibold text-slate-600" style="min-width:110px">合同余额(万元)</th>
+                <th class="px-2 py-2 text-left font-semibold text-slate-600" style="min-width:120px">贷款投向行业</th>
+                <th class="px-2 py-2 text-left font-semibold text-slate-600" style="min-width:90px">合同类型</th>
+                <th class="px-2 py-2 text-left font-semibold text-slate-600" style="min-width:120px">信贷系统识别状态</th>
+                <th class="px-2 py-2 text-left font-semibold text-slate-600" style="min-width:200px">信贷系统涉农识别结果</th>
+                <th class="px-2 py-2 text-left font-semibold text-slate-600" style="min-width:220px">信贷系统涉绿识别结果</th>
+                <th class="px-2 py-2 text-center font-semibold text-slate-600" style="min-width:120px">项目是否已有绿色贷款</th>
+                <th class="px-2 py-2 text-center font-semibold text-slate-600" style="min-width:120px">客户是否已有绿色贷款</th>
+                <th class="px-2 py-2 text-left font-semibold text-slate-600" style="min-width:90px">业务条线</th>
+                <th class="px-2 py-2 text-left font-semibold text-slate-600" style="min-width:80px">合同状态</th>
+                <th class="px-2 py-2 text-left font-semibold text-slate-600" style="min-width:120px">项目代码</th>
+                <th class="px-2 py-2 text-left font-semibold text-slate-600" style="min-width:160px">项目名称</th>
+                <th class="px-2 py-2 text-left font-semibold text-slate-600" style="min-width:130px">客户编号</th>
+                <th class="px-2 py-2 text-left font-semibold text-slate-600" style="min-width:180px">客户名称</th>
+                <th class="px-2 py-2 text-left font-semibold text-slate-600" style="min-width:140px">国民经济行业大类</th>
+                <th class="px-2 py-2 text-left font-semibold text-slate-600" style="min-width:160px">客户国民经济行业</th>
+                <th class="px-2 py-2 text-left font-semibold text-slate-600" style="min-width:120px">所属分支机构</th>
+                <th class="px-2 py-2 text-left font-semibold text-slate-600" style="min-width:80px">管户人</th>
+                <th class="px-2 py-2 text-left font-semibold text-slate-600" style="min-width:80px">操作人</th>
+                <th class="px-2 py-2 text-left font-semibold text-slate-600" style="min-width:150px">最近更新时间</th>
+                <th class="px-2 py-2 text-left font-semibold text-slate-600" style="min-width:150px">创建时间</th>
+                <th class="px-2 py-2 text-center font-semibold text-slate-600 sticky-right-header" style="min-width:96px;border-left:1px solid var(--line-200)">操作</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+
+        <!-- 分页 -->
+        <div class="flex items-center justify-between px-6 py-3 border-t border-slate-100">
+          <span class="text-sm text-slate-400">共 <span id="totalCountPage" class="text-slate-600 font-medium">0</span> 条</span>
+          <div class="flex items-center gap-2" id="pagination"></div>
+        </div>
+
+        <!-- 备注 -->
+        <div class="dev-note-container">
+          <div class="note-body">
+            <strong>字段含义说明：</strong><br>
+            <strong>信贷系统识别状态：</strong>已识别=信贷系统已保存绿色认定分类；未识别=信贷系统未保存绿色认定分类；-=待确认。<br>
+            <strong>信贷系统涉农识别结果：</strong>对接行内信贷系统涉农贷款分类，展示具体涉农分类（农林牧渔业贷款/农户贷款/农村非金融企业及机关团体贷款/城市非金融企业及机关团体涉农贷款/非涉农）。<br>
+            <strong>信贷系统涉绿识别结果：</strong>对接行内信贷系统绿色认定分类，展示具体三级分类编码与名称（如"4.2.2 太阳能利用设施建设和运营"）或"非绿"。<br>
+            <strong>项目是否已有绿色贷款：</strong>该合同关联项目项下是否已存在绿色贷款标识；客户是否已有绿色贷款：该客户名下是否已存在绿色贷款标识。
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+<script>
+// ============ 模拟贷款智能识别记录数据 ============
+var loansData = [
+  {
+    contractNo:"QH2024-12001", bizCatLarge:"对公贷款", bizType:"项目融资",
+    amount:20050, balance:18520, industry:"太阳能发电", contractType:"项目类",
+    creditStatus:"已识别", creditAgriResult:"非涉农",
+    creditGreenResult:"4.2.2 太阳能利用设施建设和运营",
+    projHasGreen:"是", custHasGreen:"是",
+    bizLine:"对公贷款", contractStatus:"已发放",
+    projCode:"PRJ-QH-2024-0892", projName:"海南州共和县塔拉滩光伏产业园区生态修复及农光互补项目",
+    custId:"C20241002356", custName:"青海绿能生态修复有限公司",
+    industryCat:"电力、热力、燃气及水生产和供应业", custIndustry:"太阳能发电",
+    branch:"海南州农商行-共和支行", manager:"李明轩", operator:"马海燕",
+    updateTime:"2026-06-22 14:20:05", createTime:"2024-03-15 10:30:00"
+  },
+  {
+    contractNo:"QH2024-12002", bizCatLarge:"对公贷款", bizType:"流动资金贷款",
+    amount:4800, balance:3200, industry:"农产品加工", contractType:"非项目类",
+    creditStatus:"已识别", creditAgriResult:"农村非金融企业及机关团体贷款",
+    creditGreenResult:"非绿",
+    projHasGreen:"—", custHasGreen:"否",
+    bizLine:"对公贷款", contractStatus:"正常",
+    projCode:"—", projName:"—",
+    custId:"C20241008842", custName:"海东市祥云农牧科技有限公司",
+    industryCat:"制造业", custIndustry:"农副食品加工业",
+    branch:"海东农商行-乐都支行", manager:"王芳", operator:"王芳",
+    updateTime:"2026-06-20 10:15:30", createTime:"2024-05-22 09:00:00"
+  },
+  {
+    contractNo:"QH2024-12003", bizCatLarge:"个人贷款", bizType:"经营性贷款",
+    amount:30, balance:15, industry:"中药材种植", contractType:"非项目类",
+    creditStatus:"已识别", creditAgriResult:"农户贷款",
+    creditGreenResult:"2.4.1 农用地污染治理",
+    projHasGreen:"—", custHasGreen:"否",
+    bizLine:"个人贷款", contractStatus:"已发放",
+    projCode:"—", projName:"—",
+    custId:"P632521198805123456", custName:"马占彪",
+    industryCat:"农、林、牧、渔业", custIndustry:"中药材种植",
+    branch:"海南州农商行-贵德支行", manager:"李明轩", operator:"马海燕",
+    updateTime:"2026-06-21 10:12:55", createTime:"2024-06-08 14:20:00"
+  },
+  {
+    contractNo:"QH2024-12004", bizCatLarge:"对公贷款", bizType:"项目融资",
+    amount:32000, balance:29800, industry:"风力发电", contractType:"项目类",
+    creditStatus:"已识别", creditAgriResult:"非涉农",
+    creditGreenResult:"4.2.1 风力发电设施建设和运营",
+    projHasGreen:"是", custHasGreen:"是",
+    bizLine:"对公贷款", contractStatus:"已发放",
+    projCode:"PRJ-QH-2024-1103", projName:"海西州大柴旦50MW风力发电场建设运营项目",
+    custId:"C20241005671", custName:"青海三江风电有限公司",
+    industryCat:"电力、热力、燃气及水生产和供应业", custIndustry:"风力发电",
+    branch:"海西州农商行-大柴旦支行", manager:"王芳", operator:"张永强",
+    updateTime:"2026-06-19 09:30:12", createTime:"2024-07-11 08:45:00"
+  },
+  {
+    contractNo:"QH2024-12005", bizCatLarge:"对公贷款", bizType:"流动资金贷款",
+    amount:1500, balance:900, industry:"批发零售", contractType:"非项目类",
+    creditStatus:"—", creditAgriResult:"非涉农",
+    creditGreenResult:"非绿",
+    projHasGreen:"—", custHasGreen:"否",
+    bizLine:"对公贷款", contractStatus:"正常",
+    projCode:"—", projName:"—",
+    custId:"C20241006238", custName:"西宁瑞景商贸有限公司",
+    industryCat:"批发和零售业", custIndustry:"纺织、服装及日用品专门零售",
+    branch:"西宁农商行-城中支行", manager:"王芳", operator:"王芳",
+    updateTime:"2026-06-17 16:40:00", createTime:"2024-01-20 11:00:00"
+  },
+  {
+    contractNo:"QH2024-12006", bizCatLarge:"涉农贷款", bizType:"固定资产贷款",
+    amount:860, balance:720, industry:"畜牧业", contractType:"非项目类",
+    creditStatus:"已识别", creditAgriResult:"农林牧渔业贷款",
+    creditGreenResult:"5.2.6 荒漠化和石漠化综合治理",
+    projHasGreen:"—", custHasGreen:"是",
+    bizLine:"涉农贷款", contractStatus:"已发放",
+    projCode:"—", projName:"—",
+    custId:"C20241007120", custName:"青海湖生态牧业专业合作社",
+    industryCat:"农、林、牧、渔业", custIndustry:"牲畜饲养",
+    branch:"海北州农商行-刚察支行", manager:"张磊", operator:"陈志宏",
+    updateTime:"2026-06-22 08:55:41", createTime:"2024-04-03 15:30:00"
+  },
+  {
+    contractNo:"QH2024-12007", bizCatLarge:"个人贷款", bizType:"消费贷款",
+    amount:8, balance:5, industry:"零售", contractType:"非项目类",
+    creditStatus:"已识别", creditAgriResult:"非涉农",
+    creditGreenResult:"非绿",
+    projHasGreen:"—", custHasGreen:"否",
+    bizLine:"个人贷款", contractStatus:"正常",
+    projCode:"—", projName:"—",
+    custId:"P632121199203654321", custName:"冶兰花",
+    industryCat:"批发和零售业", custIndustry:"综合零售",
+    branch:"西宁农商行-城东支行", manager:"张磊", operator:"张磊",
+    updateTime:"2026-06-16 18:00:00", createTime:"2024-02-28 10:15:00"
+  },
+  {
+    contractNo:"QH2024-12008", bizCatLarge:"对公贷款", bizType:"项目融资",
+    amount:58000, balance:55200, industry:"氢能/太阳能发电", contractType:"项目类",
+    creditStatus:"已识别", creditAgriResult:"非涉农",
+    creditGreenResult:"4.2.2 太阳能利用设施建设和运营",
+    projHasGreen:"是", custHasGreen:"是",
+    bizLine:"对公贷款", contractStatus:"已发放",
+    projCode:"PRJ-QH-2025-0217", projName:"德令哈光伏制氢一体化示范项目",
+    custId:"C20241008895", custName:"海西绿氢能源科技有限公司",
+    industryCat:"电力、热力、燃气及水生产和供应业", custIndustry:"氢能利用",
+    branch:"海西州农商行-德令哈支行", manager:"王芳", operator:"张永强",
+    updateTime:"2026-06-16 11:20:33", createTime:"2025-01-10 09:00:00"
+  },
+  {
+    contractNo:"QH2024-12009", bizCatLarge:"涉农贷款", bizType:"经营性贷款",
+    amount:20, balance:12, industry:"谷物种植", contractType:"非项目类",
+    creditStatus:"未识别", creditAgriResult:"农户贷款",
+    creditGreenResult:"非绿",
+    projHasGreen:"—", custHasGreen:"否",
+    bizLine:"涉农贷款", contractStatus:"生效",
+    projCode:"—", projName:"—",
+    custId:"P632126198510123456", custName:"互助县青稞种植家庭农场",
+    industryCat:"农、林、牧、渔业", custIndustry:"谷物种植",
+    branch:"互助县联社-威远信用社", manager:"张磊", operator:"陈志宏",
+    updateTime:"2026-06-22 09:00:00", createTime:"2024-08-15 16:00:00"
+  },
+  {
+    contractNo:"QH2024-12010", bizCatLarge:"对公贷款", bizType:"项目融资",
+    amount:120000, balance:115000, industry:"化学原料制造", contractType:"项目类",
+    creditStatus:"未识别", creditAgriResult:"非涉农",
+    creditGreenResult:"非绿",
+    projHasGreen:"否", custHasGreen:"否",
+    bizLine:"对公贷款", contractStatus:"已发放",
+    projCode:"PRJ-QH-2025-0401", projName:"盐湖提锂二期扩建项目",
+    custId:"C20241009330", custName:"青海盐湖蓝科锂业股份有限公司",
+    industryCat:"制造业", custIndustry:"化学原料和化学制品制造业",
+    branch:"海西州农商行-格尔木支行", manager:"李明轩", operator:"马海燕",
+    updateTime:"2026-06-22 13:25:18", createTime:"2025-03-20 14:00:00"
+  },
+  {
+    contractNo:"QH2024-12011", bizCatLarge:"对公贷款", bizType:"固定资产贷款",
+    amount:3600, balance:3100, industry:"饮料制造", contractType:"非项目类",
+    creditStatus:"已识别", creditAgriResult:"农村非金融企业及机关团体贷款",
+    creditGreenResult:"5.2.6 荒漠化和石漠化综合治理",
+    projHasGreen:"—", custHasGreen:"否",
+    bizLine:"对公贷款", contractStatus:"正常",
+    projCode:"—", projName:"—",
+    custId:"C20241010458", custName:"祁连山矿泉水开发有限公司",
+    industryCat:"制造业", custIndustry:"饮料制造",
+    branch:"海北州农商行-祁连支行", manager:"张磊", operator:"陈志宏",
+    updateTime:"2026-06-15 09:10:22", createTime:"2024-09-05 10:30:00"
+  },
+  {
+    contractNo:"QH2024-12012", bizCatLarge:"涉农贷款", bizType:"经营性贷款",
+    amount:15, balance:8, industry:"畜牧业", contractType:"非项目类",
+    creditStatus:"已识别", creditAgriResult:"农林牧渔业贷款",
+    creditGreenResult:"非绿",
+    projHasGreen:"—", custHasGreen:"否",
+    bizLine:"涉农贷款", contractStatus:"正常",
+    projCode:"—", projName:"—",
+    custId:"P632221197608123456", custName:"更登多吉",
+    industryCat:"农、林、牧、渔业", custIndustry:"牲畜饲养",
+    branch:"海南州农商行-兴海支行", manager:"李明轩", operator:"马海燕",
+    updateTime:"2026-06-14 10:00:00", createTime:"2024-06-18 09:00:00"
+  },
+  {
+    contractNo:"QH2024-12013", bizCatLarge:"对公贷款", bizType:"项目融资",
+    amount:18000, balance:16500, industry:"水力发电", contractType:"项目类",
+    creditStatus:"已识别", creditAgriResult:"城市非金融企业及机关团体涉农贷款",
+    creditGreenResult:"4.1.1 大型水力发电设施建设和运营",
+    projHasGreen:"是", custHasGreen:"是",
+    bizLine:"对公贷款", contractStatus:"已发放",
+    projCode:"PRJ-QH-2023-0765", projName:"黄南州李家峡水电站扩容改造项目",
+    custId:"C20241011560", custName:"青海黄河上游水电开发有限责任公司",
+    industryCat:"电力、热力、燃气及水生产和供应业", custIndustry:"水力发电",
+    branch:"黄南州农商行-尖扎支行", manager:"马玉兰", operator:"马玉兰",
+    updateTime:"2026-06-23 08:50:00", createTime:"2023-11-20 15:00:00"
+  }
+];
+
+var PAGE_SIZE = 10;
+var currentPage = 1;
+var filteredData = [];
+
+function val(id){ var el=document.getElementById(id); return el?el.value.trim():''; }
+
+function contractTypeTag(t){
+  if(t==='项目类') return '<span class="tag tag-brand">项目类</span>';
+  return '<span class="tag tag-default">非项目类</span>';
+}
+
+function creditStatusTag(s){
+  if(s==='已识别') return '<span class="tag tag-success">已识别</span>';
+  if(s==='未识别') return '<span class="tag tag-danger">未识别</span>';
+  return '<span class="tag tag-default">-</span>';
+}
+
+function agriResultTag(r){
+  if(r==='非涉农') return '<span class="tag tag-default">非涉农</span>';
+  if(r==='农户贷款') return '<span class="tag tag-info">农户贷款</span>';
+  if(r==='农林牧渔业贷款') return '<span class="tag tag-success">农林牧渔业贷款</span>';
+  if(r.indexOf('农村')===0) return '<span class="tag tag-info">'+r+'</span>';
+  if(r.indexOf('城市')===0) return '<span class="tag tag-warning">'+r+'</span>';
+  return '<span class="tag tag-default">'+r+'</span>';
+}
+
+function greenResultTag(r){
+  if(!r||r==='非绿') return '<span class="tag tag-danger">非绿</span>';
+  return '<span class="tag tag-success">'+r+'</span>';
+}
+
+function ynTag(v){
+  if(v==='是') return '<span class="tag tag-success">是</span>';
+  if(v==='否') return '<span class="tag tag-danger">否</span>';
+  return '<span class="tag tag-default">—</span>';
+}
+
+function contractStatusTag(s){
+  if(s==='已发放'||s==='生效') return '<span class="tag tag-success">'+s+'</span>';
+  return '<span class="tag tag-info">'+s+'</span>';
+}
+
+function fmtWan(n){ if(n==null) return '—'; return n.toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+
+function applyFilters(){
+  var fc = val('filterContract').toLowerCase();
+  var fcust = val('filterCustomer').toLowerCase();
+  var findustry = val('filterIndustry');
+  var fbizType = val('filterBizType');
+  var fbizLine = val('filterBizLine');
+  var forg = val('filterOrg');
+  var fm = val('filterManager').toLowerCase();
+  var fct = val('filterContractType');
+  var fstatus = val('filterStatus');
+  var fagri = val('filterAgri');
+  var fgreen = val('filterGreen');
+
+  filteredData = loansData.filter(function(l){
+    if(fc && !(l.contractNo.toLowerCase().indexOf(fc)>-1 || l.projCode.toLowerCase().indexOf(fc)>-1)) return false;
+    if(fcust && !(l.custName.toLowerCase().indexOf(fcust)>-1 || l.custId.toLowerCase().indexOf(fcust)>-1)) return false;
+    if(findustry && findustry!=='全部' && l.industry.indexOf(findustry)===-1) return false;
+    if(fbizType && fbizType!=='全部' && l.bizType!==fbizType) return false;
+    if(fbizLine && fbizLine!=='全部' && l.bizLine!==fbizLine) return false;
+    if(forg && forg!=='全部' && l.branch.indexOf(forg)===-1) return false;
+    if(fm && l.manager.toLowerCase().indexOf(fm)===-1) return false;
+    if(fct && fct!=='全部' && l.contractType!==fct) return false;
+    if(fstatus && fstatus!=='全部' && l.creditStatus!==fstatus) return false;
+    if(fagri && fagri!=='全部' && l.creditAgriResult!==fagri) return false;
+    if(fgreen && fgreen!=='全部'){
+      if(fgreen==='绿色' && l.creditGreenResult==='非绿') return false;
+      if(fgreen==='非绿' && l.creditGreenResult!=='非绿') return false;
+    }
+    return true;
+  });
+  currentPage = 1;
+  renderTable();
+}
+
+function renderTable(){
+  var total = filteredData.length;
+  var totalPages = Math.max(1, Math.ceil(total/PAGE_SIZE));
+  if(currentPage>totalPages) currentPage = totalPages;
+  var start = (currentPage-1)*PAGE_SIZE;
+  var pageData = filteredData.slice(start, start+PAGE_SIZE);
+
+  var tbody = document.getElementById('tableBody');
+  if(pageData.length===0){
+    tbody.innerHTML = '<tr class="data-row"><td colspan="26" class="px-2 py-12 text-center" style="color:var(--ink-400)">未找到匹配的识别记录，请调整筛选条件</td></tr>';
+  } else {
+    tbody.innerHTML = pageData.map(function(l){
+      return '<tr class="data-row">'
+        + '<td class="px-2 py-2 font-mono" style="color:var(--brand-500);cursor:pointer" onclick="goDetail(\''+l.contractNo+'\')">'+l.contractNo+'</td>'
+        + '<td class="px-2 py-2" style="color:var(--ink-600)">'+l.bizCatLarge+'</td>'
+        + '<td class="px-2 py-2" style="color:var(--ink-600)">'+l.bizType+'</td>'
+        + '<td class="px-2 py-2 font-num" style="text-align:right">'+fmtWan(l.amount)+'</td>'
+        + '<td class="px-2 py-2 font-num" style="text-align:right">'+fmtWan(l.balance)+'</td>'
+        + '<td class="px-2 py-2" style="color:var(--ink-600)">'+l.industry+'</td>'
+        + '<td class="px-2 py-2">'+contractTypeTag(l.contractType)+'</td>'
+        + '<td class="px-2 py-2">'+creditStatusTag(l.creditStatus)+'</td>'
+        + '<td class="px-2 py-2">'+agriResultTag(l.creditAgriResult)+'</td>'
+        + '<td class="px-2 py-2">'+greenResultTag(l.creditGreenResult)+'</td>'
+        + '<td class="px-2 py-2 text-center">'+ynTag(l.projHasGreen)+'</td>'
+        + '<td class="px-2 py-2 text-center">'+ynTag(l.custHasGreen)+'</td>'
+        + '<td class="px-2 py-2" style="color:var(--ink-600)">'+l.bizLine+'</td>'
+        + '<td class="px-2 py-2">'+contractStatusTag(l.contractStatus)+'</td>'
+        + '<td class="px-2 py-2 font-mono" style="font-size:12px;color:var(--ink-500)">'+l.projCode+'</td>'
+        + '<td class="px-2 py-2" style="color:var(--ink-600)">'+l.projName+'</td>'
+        + '<td class="px-2 py-2 font-mono" style="font-size:12px;color:var(--ink-500)">'+l.custId+'</td>'
+        + '<td class="px-2 py-2 font-medium" style="color:var(--ink-800)">'+l.custName+'</td>'
+        + '<td class="px-2 py-2" style="color:var(--ink-600)">'+l.industryCat+'</td>'
+        + '<td class="px-2 py-2" style="color:var(--ink-600)">'+l.custIndustry+'</td>'
+        + '<td class="px-2 py-2" style="color:var(--ink-600)">'+l.branch+'</td>'
+        + '<td class="px-2 py-2" style="color:var(--ink-600)">'+l.manager+'</td>'
+        + '<td class="px-2 py-2" style="color:var(--ink-600)">'+l.operator+'</td>'
+        + '<td class="px-2 py-2 font-mono" style="font-size:11px;color:var(--ink-500)">'+l.updateTime+'</td>'
+        + '<td class="px-2 py-2 font-mono" style="font-size:11px;color:var(--ink-500)">'+l.createTime+'</td>'
+        + '<td class="px-2 py-2 sticky-right text-center"><button class="btn btn-secondary btn-sm" onclick="goDetail(\''+l.contractNo+'\')">查看详情</button></td>'
+        + '</tr>';
+    }).join('');
+  }
+
+  document.getElementById('totalCountBar').innerText = total;
+  document.getElementById('totalCountPage').innerText = total;
+  renderPagination(totalPages);
+}
+
+function renderPagination(totalPages){
+  var p = document.getElementById('pagination');
+  var html = '';
+  html += '<button class="btn btn-secondary btn-sm" '+(currentPage===1?'disabled':'')+' onclick="goPage('+(currentPage-1)+')">&lsaquo;</button>';
+  for(var i=1;i<=totalPages;i++){
+    html += '<button class="page-btn'+(i===currentPage?' active':'')+'" onclick="goPage('+i+')">'+i+'</button>';
+  }
+  html += '<button class="btn btn-secondary btn-sm" '+(currentPage===totalPages?'disabled':'')+' onclick="goPage('+(currentPage+1)+')">&rsaquo;</button>';
+  html += '<span class="text-sm text-slate-500 ml-2">跳至 <input type="number" class="jump-input" id="jumpInput" value="'+currentPage+'" min="1" max="'+totalPages+'" onchange="jumpTo('+totalPages+')"> /'+totalPages+'页</span>';
+  p.innerHTML = html;
+}
+
+function jumpTo(totalPages){
+  var inp = document.getElementById('jumpInput');
+  var n = parseInt(inp.value);
+  if(isNaN(n)||n<1) n=1;
+  if(n>totalPages) n=totalPages;
+  goPage(n);
+}
+
+function goPage(n){ currentPage = n; renderTable(); }
+
+function handleSearch(){ applyFilters(); }
+
+function handleReset(){
+  document.querySelectorAll('.filter-item input[type="text"]').forEach(function(i){i.value=''});
+  document.querySelectorAll('.filter-item input[type="date"]').forEach(function(i){i.value=''});
+  document.querySelectorAll('.filter-item select').forEach(function(s){s.selectedIndex=0});
+  applyFilters();
+}
+
+function exportList(){
+  alert('演示功能：导出当前列表（共 '+filteredData.length+' 条）为 Excel，实际对接报表平台。');
+}
+
+function goDetail(contractNo){
+  window.location.href = '涉农涉绿识别.html?contractNo='+encodeURIComponent(contractNo);
+}
+
+window.onload = function(){ applyFilters(); };
+</script>
+</body>
+</html>

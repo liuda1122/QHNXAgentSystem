@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>涉农绿色智能识别 | 青海农信</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  /* ============ Design Tokens ============ */
+  :root {
+    --brand-50:#E8F0FB; --brand-100:#D1DFF4; --brand-300:#6E97D6;
+    --brand-500:#2A66C2; --brand-700:#143F8F; --brand-900:#01256A;
+    --green-50:#ECFDF5; --green-100:#D1FAE5; --green-300:#6EE7B7;
+    --green-500:#10B981; --green-700:#047857; --green-900:#064E3B;
+    --success:#10B981; --success-bg:#ECFDF5; --success-border:#A7F3D0;
+    --warning:#D97706; --warning-bg:#FFFBEB; --warning-border:#FDE68A;
+    --danger:#DC2626;  --danger-bg:#FEF2F2;  --danger-border:#FECACA;
+    --info:#2A66C2;    --info-bg:#E8F0FB;    --info-border:#D1DFF4;
+    --ink-900:#0F172A; --ink-800:#1E293B; --ink-600:#475569;
+    --ink-500:#64748B; --ink-400:#94A3B8; --ink-300:#CBD5E1;
+    --line-200:#E2E8F0; --bg-muted:#F1F5F9; --bg-subtle:#F8FAFC;
+    --white:#FFFFFF;
+    --radius-sm:4px; --radius-md:6px; --radius-lg:8px;
+    --radius-xl:12px; --radius-2xl:16px; --radius-full:9999px;
+    --shadow-xs:0 1px 2px rgba(15,23,42,.04);
+    --shadow-sm:0 1px 3px rgba(15,23,42,.06),0 1px 2px rgba(15,23,42,.04);
+    --shadow-md:0 4px 8px rgba(15,23,42,.06),0 2px 4px rgba(15,23,42,.04);
+    --s-1:4px; --s-2:8px; --s-3:12px; --s-4:16px; --s-5:20px;
+    --s-6:24px; --s-8:32px;
+    --font-sans:'PingFang SC','Microsoft YaHei','Inter',system-ui,-apple-system,sans-serif;
+    --font-num:'Inter','SF Pro Display',system-ui,sans-serif;
+    --font-mono:'JetBrains Mono','SF Mono','Menlo','Consolas',monospace;
+  }
+
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font-sans);color:var(--ink-800);background:var(--bg-subtle);font-size:14px;line-height:1.57;-webkit-font-smoothing:antialiased}
+  
+  /* 规范内组件样式延用 */
+  .form-section{margin-bottom:var(--s-6);background:var(--white);border-radius:var(--radius-xl);border:1px solid var(--line-200);overflow:hidden;box-shadow:0 4px 12px -2px rgba(15,23,42,0.08);}
+  .form-section-head{display:flex;align-items:center;gap:var(--s-3);padding:var(--s-3) var(--s-4);background:linear-gradient(135deg,var(--brand-50) 0%,var(--bg-subtle) 100%);border-bottom:1px solid var(--line-200);}
+  /* 移除所有图标相关的样式，但不影响布局 */
+  .form-section-icon{display:none;}  /* 完全隐藏图标区域 */
+  .form-section-title{font-size:16px;line-height:24px;font-weight:600;color:var(--ink-900);}
+  .form-section-desc{margin-left:auto;font-size:12px;color:var(--ink-500);}
+  .form-section-body{padding:var(--s-6);}
+  .form-group{margin-bottom:var(--s-4);padding:var(--s-4);background:var(--bg-subtle);border-radius:var(--radius-lg);}
+  .form-group:last-child{margin-bottom:0;}
+  .form-group-head{display:flex;align-items:center;gap:var(--s-2);margin-bottom:var(--s-4);padding-bottom:var(--s-3);border-bottom:1px solid var(--line-200);}
+  .form-group-head::before{content:"";width:3px;height:14px;background:var(--brand-500);border-radius:var(--radius-sm);flex-shrink:0;}
+  .form-group-title{font-size:14px;line-height:22px;font-weight:600;color:var(--ink-800);}
+  .form-group-badge{padding:2px 8px;background:var(--brand-50);color:var(--brand-700);font-size:11px;font-weight:500;border-radius:var(--radius-sm);}
+  .form-field-wrap{padding:var(--s-2) var(--s-4);}
+  .fieldset{margin-bottom:var(--s-4);padding: var(--s-4);background:var(--white);border:1px solid var(--line-200);border-radius:var(--radius-lg);}
+  .form-field{display:grid;grid-template-columns:160px minmax(200px,1fr);align-items:start;gap:var(--s-4);margin-bottom:var(--s-4);}
+  .form-field:last-child{margin-bottom:0;}
+  .form-field-2{display:grid;grid-template-columns:160px minmax(200px,1fr) 160px minmax(200px,1fr);align-items:start;gap:var(--s-4);margin-bottom:var(--s-4);}
+  .lbl{text-align:right;font-size:14px;color:var(--ink-700);font-weight:500;padding-top:var(--s-2);line-height:22px;}
+  .lbl .req{color:var(--danger);margin-right:var(--s-1);}
+  .ctrl{min-width:0;}
+  .input,.select-native,.textarea{width:100%;padding:5px 12px;height:32px;font-family:inherit;font-size:14px;line-height:22px;color:var(--ink-900);background:var(--white);border:1px solid var(--ink-300);border-radius:var(--radius-md);transition:all .15s;outline:none;}
+  .input:focus,.select-native:focus,.textarea:focus{border-color:var(--brand-500);box-shadow:0 0 0 3px rgba(42,102,194,.12);}
+  .textarea{height:auto;min-height:80px;resize:vertical;}
+  .select-native{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:32px;}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;border-radius:var(--radius-md);font-weight:500;cursor:pointer;transition:all .15s;border:1px solid transparent;line-height:1;padding:8px 20px;font-size:14px;height:36px;}
+  .btn-primary{background:var(--brand-500);color:#fff;}
+  .btn-primary:hover{background:var(--brand-700);}
+  .btn-secondary{background:var(--white);color:var(--ink-800);border-color:var(--ink-300);}
+  .btn-secondary:hover{border-color:var(--brand-500);color:var(--brand-500);}
+  .btn-outline{border:1px solid var(--ink-300);background:white;color:var(--ink-700);}
+  .btn-outline:hover{background:var(--bg-muted);}
+  
+  /* 严肃金融容器 */
+  .serious-card{border:1px solid var(--line-200);border-radius:var(--radius-lg);background:var(--white);padding:16px;margin-bottom:16px;}
+  .serious-card:last-child{margin-bottom:0;}
+  .gray-border-text{background:#F9FAFB;border:1px solid var(--line-200);border-radius:var(--radius-md);padding:12px 16px;color:var(--ink-700);font-size:14px;line-height:1.6;}
+  
+  /* 绿色分类展示样式（tag风格） */
+  .green-category-item{background:var(--brand-50);border-left:3px solid var(--brand-500);padding:10px 14px;border-radius:var(--radius-md);margin-bottom:8px;font-size:13px;font-family:var(--font-mono);color:var(--ink-800);}
+  .green-category-item:last-child{margin-bottom:0;}
+  .green-category-code{font-weight:600;color:var(--brand-700);margin-right:8px;}
+  
+  .status-badge{padding:4px 16px;border-radius:40px;font-weight:600;font-size:0.85rem;display:inline-flex;align-items:center;}
+  .status-green{background:#dcfce7;color:#15803d;}
+  .status-agri{background:#e0f2fe;color:#0369a1;}
+  .tag{display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:var(--radius-sm);font-size:12px;font-weight:500;}
+  .tag-brand{background:var(--brand-50);color:var(--brand-700);}
+  
+  .file-item{display:flex;align-items:center;justify-content:space-between;background:var(--bg-subtle);border-radius:var(--radius-md);padding:8px 12px;border:1px solid var(--line-200);}
+  .file-name{font-size:13px;color:var(--ink-700);font-family:var(--font-mono);}
+  .download-link{color:var(--brand-500);cursor:pointer;font-size:12px;text-decoration:none;}
+  .download-link:hover{text-decoration:underline;}
+  .flex-between{display:flex;justify-content:space-between;align-items:center;}
+  .action-buttons{display:flex;gap:12px;justify-content:flex-end;margin-top:24px;padding-top:16px;border-top:1px solid var(--line-200);}
+  .reidentify-btn{font-size:12px;padding:4px 12px;background:white;border:1px solid var(--ink-300);border-radius:20px;cursor:pointer;}
+  .reidentify-btn:hover{background:var(--bg-muted);}
+  
+  /* 移除所有图标相关展示，按钮文字无图标 */
+  .btn svg, .reidentify-btn svg, .tag svg, .status-badge svg { display: none; }
+
+  /* 合规性核查网格 */
+  .compliance-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
+  .compliance-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg-subtle);border-radius:var(--radius-md);border:1px solid var(--line-200);}
+  .compliance-label{font-size:13px;color:var(--ink-700);}
+  .compliance-value{padding:2px 12px;border-radius:var(--radius-full);font-size:12px;font-weight:600;}
+  .compliance-pass{background:#dcfce7;color:#15803d;}
+  .compliance-fail{background:#fee2e2;color:#b91c1c;}
+  .tag-success{background:#dcfce7;color:#15803d;padding:2px 10px;border-radius:var(--radius-sm);font-size:12px;font-weight:500;}
+  .tag-danger{background:#fee2e2;color:#b91c1c;padding:2px 10px;border-radius:var(--radius-sm);font-size:12px;font-weight:500;}
+  .tag-default{background:var(--bg-muted);color:var(--ink-500);padding:2px 10px;border-radius:var(--radius-sm);font-size:12px;font-weight:500;}
+</style>
+</head>
+<body>
+
+<div style="max-width:95vw;margin:24px auto;padding:0 12px;">
+  <!-- 页面头部 -->
+  <div class="flex-between" style="margin-bottom:28px;">
+    <div>
+      <h1 style="font-size:30px;font-weight:700;color:var(--ink-900);letter-spacing:-0.01em;">涉农绿色智能识别</h1>
+      <p style="color:var(--ink-600);margin-top:8px;">智能体自动判定 · 双标签并行 · 人工复核留痕 · 结果回传信贷系统</p>
+    </div>
+    <div class="flex gap-2">
+      <span class="tag tag-brand">合同号: HT01232XXXXX</span>
+      <span class="tag tag-brand">依据《2024金融统计修订》&《绿色目录2025》</span>
+    </div>
+  </div>
+
+  <!-- 第1层：合同信息 -->
+  <div class="form-section">
+    <div class="form-section-head">
+      <div class="form-section-title">合同信息</div>
+      <div class="form-section-desc">新一代信贷系统推送</div>
+    </div>
+    <div class="form-section-body">
+      <div class="form-field-2">
+        <div class="lbl">合同编号</div><div class="ctrl"><input class="input" value="HT01232XXXXX" disabled></div>
+        <div class="lbl">合同金额</div><div class="ctrl"><input class="input" value="¥200,500,000.00" disabled></div>
+      </div>
+      <div class="form-field-2">
+        <div class="lbl">合同期限</div><div class="ctrl"><input class="input" value="2024-10-02 至 2027-12-12" disabled></div>
+        <div class="lbl">贷款用途</div><div class="ctrl"><input class="input" value="光伏产业园区生态修复及农光互补项目" disabled></div>
+      </div>
+      <div class="form-field-2">
+        <div class="lbl">贷款投向行业</div><div class="ctrl"><input class="input" value="太阳能发电 / 生态保护" disabled></div>
+        <div class="lbl"></div><div class="ctrl"></div>
+      </div>
+      <div class="form-field">
+        <div class="lbl">基本信息上传</div>
+        <div class="ctrl">
+          <div class="file-item" id="contractFileDisplayArea">
+            <span class="file-name" id="contractFileNameDisplay">合同基本信息清单_2025.pdf</span>
+            <a class="download-link" id="contractDownloadBtn">下载文件</a>
+          </div>
+          <input type="file" id="uploadContractFile" style="display:none;" accept=".pdf,.jpg,.png">
+          <button type="button" class="btn btn-outline" style="margin-top:8px; padding:4px 12px; height:30px; font-size:12px;" id="contractUploadBtn">上传新文件</button>
+          <div class="text-xs text-gray-500 mt-1">支持PDF/图片，最多20MB</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 第2层：客户信息 -->
+  <div class="form-section">
+    <div class="form-section-head">
+      <div class="form-section-title">客户信息</div>
+      <div class="form-section-desc">新一代信贷系统推送</div>
+    </div>
+    <div class="form-section-body">
+      <div class="form-field-2">
+        <div class="lbl">客户号</div><div class="ctrl"><input class="input" value="C20241002356" disabled></div>
+        <div class="lbl">客户名称</div><div class="ctrl"><input class="input" id="customerNameInput" value="青海绿能生态修复有限公司" disabled></div>
+      </div>
+      <div class="form-field-2">
+        <div class="lbl">组织机构代码证号/身份证号</div><div class="ctrl"><input class="input" id="customerIdInput" value="91630000MA******R" disabled></div>
+        <div class="lbl">客户类型</div><div class="ctrl">
+          <select id="customerTypeSelect" class="select-native" style="width:auto; min-width:160px;">
+            <option value="公司" selected>公司</option>
+            <option value="个人">个人</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-field-2">
+        <div class="lbl">经营范围</div><div class="ctrl"><input class="input" id="businessScopeInput" value="太阳能发电、土壤污染治理与生态修复、有机种植" disabled></div>
+        <div class="lbl">客户所属行业</div><div class="ctrl"><input class="input" id="customerIndustryInput" value="太阳能发电 / 生态保护" disabled></div>
+      </div>
+      <div class="form-field-2">
+        <div class="lbl">经营地址</div><div class="ctrl"><input class="input" id="businessAddrInput" value="青海省海南州共和县绿源产业园区" disabled></div>
+        <div class="lbl">注册地址</div><div class="ctrl"><input class="input" id="regAddrInput" value="青海省海南州共和县绿源产业园区(农村区域)" disabled></div>
+      </div>
+      <div class="form-field-2">
+        <div class="lbl">家庭住址</div><div class="ctrl"><input class="input" id="homeAddrInput" value="—" disabled></div>
+        <div class="lbl"></div><div class="ctrl"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 智能体识别核心区域 -->
+  <div class="form-section">
+    <div class="form-section-head">
+      <div class="form-section-title">智能体识别结果</div>
+      <div class="form-section-desc">NLP+大模型 · 基于绿色目录2025版及涉农标准</div>
+    </div>
+    <div class="form-section-body">
+      <!-- 贷款用途描述（可编辑，默认反显合同基本贷款用途） -->
+      <div class="serious-card">
+        <div class="flex-between" style="margin-bottom:12px;">
+          <span class="status-badge status-agri">贷款用途描述</span>
+          <span class="text-xs text-gray-500">默认反显合同基本贷款用途，业务人员可编辑补充</span>
+        </div>
+        <div class="form-field">
+          <div class="lbl">贷款用途描述</div>
+          <div class="ctrl"><textarea class="textarea" rows="3" id="loanPurposeDesc">资金专项用于"青海海南州光伏产业园区生态修复及农光互补项目"，包含太阳能光伏发电设施建设运营(130MW)、废弃采坑土地整治1373亩、水土流失治理、土壤修复及中藏药材(枸杞/藜麦)有机种植基地建设，配套农业灌溉设施与绿色技术。</textarea></div>
+        </div>
+      </div>
+
+      <!-- 个人客户专属字段（仅客户类型为个人时展示） -->
+      <div class="serious-card" id="individualFieldsCard" style="display:none;">
+        <div class="flex-between" style="margin-bottom:12px;">
+          <span class="status-badge status-agri">个人客户信息</span>
+          <span class="text-xs text-gray-500">客户类型为个人时展示</span>
+        </div>
+        <div class="form-field-2">
+          <div class="lbl">个人客户身份标签</div><div class="ctrl"><input class="input" value="新型农业经营主体" disabled></div>
+          <div class="lbl">是否为财政供养人员</div><div class="ctrl"><input class="input" value="否" disabled></div>
+        </div>
+      </div>
+
+      <!-- Block A: 涉农贷款识别 -->
+      <div class="serious-card">
+        <div class="flex-between" style="margin-bottom:12px;">
+          <span class="status-badge status-agri">涉农贷款识别</span>
+          <button class="reidentify-btn" id="reidentifyAgriBtn">重新识别</button>
+        </div>
+        <div class="form-field">
+          <div class="lbl">是否涉农</div>
+          <div class="ctrl"><span class="tag tag-success">是</span></div>
+        </div>
+        <div class="form-field">
+          <div class="lbl">涉农贷款分类</div>
+          <div class="ctrl"><div class="gray-border-text">农村非金融企业及机关团体贷款</div></div>
+        </div>
+      </div>
+
+      <!-- Block B: 青海特色产业目录 -->
+      <div class="serious-card">
+        <div class="flex-between" style="margin-bottom:12px;">
+          <span class="status-badge" style="background:#fef3c7;color:#92400e;">青海特色产业目录</span>
+        </div>
+        <div class="form-field">
+          <div class="lbl">特色产业</div>
+          <div class="ctrl"><div class="gray-border-text">中藏药材</div></div>
+        </div>
+      </div>
+
+      <!-- Block C: 绿色贷款识别 -->
+      <div class="serious-card">
+        <div class="flex-between" style="margin-bottom:12px;">
+          <span class="status-badge status-green">绿色贷款识别</span>
+          <button class="reidentify-btn" id="reidentifyGreenBtn">重新识别</button>
+        </div>
+        <div class="form-field">
+          <div class="lbl">是否绿色</div>
+          <div class="ctrl"><span class="tag tag-success">是</span></div>
+        </div>
+        <div class="form-field">
+          <div class="lbl">绿色认定分类</div>
+          <div class="ctrl">
+            <div class="green-category-item"><span class="green-category-code">4.2.2</span> 太阳能利用设施建设和运营</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Block D: 识别依据 -->
+      <div class="serious-card">
+        <div class="flex-between" style="margin-bottom:12px;">
+          <span class="status-badge" style="background:#e0f2fe;color:#0369a1;">识别依据</span>
+        </div>
+        <div class="form-field">
+          <div class="lbl">涉农判定依据</div>
+          <div class="ctrl"><div class="gray-border-text">①企业注册地为农村区域（海南州共和县乡镇管辖区域），依据《青海农信涉农信贷目录》农村非金融企业直接认定涉农；②贷款用途涉及农业生产资料（中藏药材种植、有机农业）、农村土地整治及生态农业基础设施建设，符合"农、林、牧、渔业及涉农服务"标准；③承贷主体经营范围含有机种植及农业技术服务，满足法人类涉农贷款规则2.2条。</div></div>
+        </div>
+        <div class="form-field">
+          <div class="lbl">绿色判定依据</div>
+          <div class="ctrl"><div class="gray-border-text">该笔贷款投向行业包括太阳能发电(清洁能源设施建设运营)及土壤污染治理与修复服务，归类于《绿色金融支持项目目录(2025版)》4.2.2太阳能利用设施建设和运营，同时废弃采坑修复及土地整治符合2.4.1农用地污染治理与2.4.2建设用地污染治理条款；项目配套生态修复措施符合5.2.6荒漠化治理要求。无重大环境违法记录，环评合规，资金专项用于绿色产业模块。</div></div>
+        </div>
+        <div class="gray-border-text" style="margin-top:8px;"><strong>涉农具体科目：</strong>法人类 · 农村非金融企业涉农贷款 → 农业生产经营贷款（农村基础设施建设/农业生态修复）</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 人工复核确认区域 -->
+  <div class="form-section">
+    <div class="form-section-head">
+      <div class="form-section-title">人工复核确认</div>
+      <div class="form-section-desc">经办人员复核修正 · 留痕回传</div>
+    </div>
+    <div class="form-section-body">
+      <!-- 合规性核查（从智能体识别区域移入） -->
+      <div class="serious-card">
+        <div class="flex-between" style="margin-bottom:12px;">
+          <span class="status-badge status-agri">合规性核查</span>
+          <span class="text-xs text-gray-500">智能体基于工商/环保/监管数据核查</span>
+        </div>
+        <div class="compliance-grid">
+          <div class="compliance-item"><span class="compliance-label">是否存在重大违法</span><span class="compliance-value compliance-pass">否</span></div>
+          <div class="compliance-item"><span class="compliance-label">环评是否合规</span><span class="compliance-value compliance-pass">是</span></div>
+          <div class="compliance-item"><span class="compliance-label">是否未批先建项目</span><span class="compliance-value compliance-pass">否</span></div>
+          <div class="compliance-item"><span class="compliance-label">是否超标排污项目</span><span class="compliance-value compliance-pass">否</span></div>
+          <div class="compliance-item"><span class="compliance-label">是否淘汰类企业</span><span class="compliance-value compliance-pass">否</span></div>
+          <div class="compliance-item"><span class="compliance-label">是否受环境违法违规处罚</span><span class="compliance-value compliance-pass">否</span></div>
+        </div>
+      </div>
+
+      <div class="form-field-2">
+        <div class="lbl">涉农标签复核</div>
+        <div class="ctrl">
+          <select id="manualAgriSelect" class="select-native" style="width:auto; min-width:160px;">
+            <option value="涉农" selected>涉农</option>
+            <option value="非涉农">非涉农</option>
+            <option value="待核实">待核实</option>
+          </select>
+        </div>
+        <div class="lbl">绿色标签复核</div>
+        <div class="ctrl">
+          <select id="manualGreenSelect" class="select-native" style="width:auto; min-width:160px;">
+            <option value="绿色" selected>绿色</option>
+            <option value="非绿色">非绿色</option>
+            <option value="待核实">待核实</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 绿色分类智能选择：基于2025版目录可单选 -->
+      <div class="form-field-2">
+        <div class="lbl">绿色分类（2025目录）</div>
+        <div class="ctrl">
+          <select id="greenCategorySelect" class="select-native">
+            <option value="4.2.2 太阳能利用设施建设和运营" selected>4.2.2 太阳能利用设施建设和运营</option>
+            <option value="2.4.1 农用地污染治理">2.4.1 农用地污染治理</option>
+            <option value="2.4.2 建设用地污染治理">2.4.2 建设用地污染治理</option>
+            <option value="5.2.6 荒漠化和石漠化综合治理">5.2.6 荒漠化和石漠化综合治理</option>
+            <option value="4.2.1 风力发电设施建设和运营">4.2.1 风力发电设施建设和运营</option>
+            <option value="7.2.6 环境污染第三方治理">7.2.6 环境污染第三方治理</option>
+            <option value="3.4.8 电网节能改造项目">3.4.8 电网节能改造项目</option>
+          </select>
+        </div>
+        <div class="lbl"></div>
+        <div class="ctrl"></div>
+      </div>
+
+      <!-- 佐证材料：上传材料文件名及下载按钮 -->
+      <div class="form-field">
+        <div class="lbl">佐证材料</div>
+        <div class="ctrl">
+          <div class="file-item" id="fileDisplayArea">
+            <span class="file-name" id="fileNameDisplay">绿色矿山修复方案批复_2025.pdf</span>
+            <a class="download-link" id="downloadFileBtn">下载文件</a>
+          </div>
+          <input type="file" id="uploadEvidence" style="display:none;" accept=".pdf,.jpg,.png">
+          <button type="button" class="btn btn-outline" style="margin-top:8px; padding:4px 12px; height:30px; font-size:12px;" id="uploadBtn">上传新文件</button>
+          <div class="text-xs text-gray-500 mt-1">支持PDF/图片，最多20MB</div>
+        </div>
+      </div>
+
+      <div class="form-field">
+        <div class="lbl">修正理由</div>
+        <div class="ctrl"><textarea class="textarea" rows="2" placeholder="若人工修正标签或分类，请填写依据说明" id="modifyReason"></textarea></div>
+      </div>
+
+      <!-- 按钮组：保存 + 返回 (无图标) -->
+      <div class="action-buttons">
+        <button id="saveBtn" class="btn btn-primary">保存</button>
+        <button id="backBtn" class="btn btn-secondary">返回</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // 智能体原始判定数据
+  const aiResult = {
+    isAgricultural: true,
+    agriReason: "企业注册地为农村区域；贷款用途涉及中藏药材种植、土地整治及农业生态配套，满足涉农目录标准。",
+    isGreen: true,
+    greenCategories: ["4.2.2 太阳能利用设施建设和运营", "2.4.1 农用地污染治理", "2.4.2 建设用地污染治理", "5.2.6 荒漠化和石漠化综合治理"],
+    greenReason: "投向光伏清洁能源+土壤污染修复+生态综合治理，符合绿色目录(2025版)多项条款，无环境违规。"
+  };
+
+  // 合规性核查结果
+  const complianceResult = {
+    majorViolation: "否",        // 是否存在重大违法
+    eiaCompliant: "是",          // 环评是否合规
+    unapprovedBuild: "否",       // 是否未批先建项目
+    excessiveEmission: "否",     // 是否超标排污项目
+    phasedOutEnterprise: "否",   // 是否淘汰类企业
+    envPenalty: "否"             // 是否受环境违法违规处罚
+  };
+
+  // 个人客户示例数据
+  const individualSample = {
+    customerName: "马占彪",
+    customerId: "632521198805******",
+    businessScope: "中藏药材种植、有机枸杞加工",
+    customerIndustry: "农业 / 中药材种植",
+    businessAddr: "—",
+    regAddr: "青海省海南州共和县恰卜恰镇",
+    homeAddr: "青海省海南州共和县恰卜恰镇××村"
+  };
+
+  // 公司客户示例数据
+  const companySample = {
+    customerName: "青海绿能生态修复有限公司",
+    customerId: "91630000MA******R",
+    businessScope: "太阳能发电、土壤污染治理与生态修复、有机种植",
+    customerIndustry: "太阳能发电 / 生态保护",
+    businessAddr: "青海省海南州共和县绿源产业园区",
+    regAddr: "青海省海南州共和县绿源产业园区(农村区域)",
+    homeAddr: "—"
+  };
+
+  // DOM 元素
+  const manualAgriSelect = document.getElementById('manualAgriSelect');
+  const manualGreenSelect = document.getElementById('manualGreenSelect');
+  const greenCategorySelect = document.getElementById('greenCategorySelect');
+  const saveBtn = document.getElementById('saveBtn');
+  const backBtn = document.getElementById('backBtn');
+  const modifyReason = document.getElementById('modifyReason');
+  const uploadEvidence = document.getElementById('uploadEvidence');
+  const uploadBtn = document.getElementById('uploadBtn');
+  const fileNameDisplay = document.getElementById('fileNameDisplay');
+  const downloadFileBtn = document.getElementById('downloadFileBtn');
+  const customerTypeSelect = document.getElementById('customerTypeSelect');
+  const individualFieldsCard = document.getElementById('individualFieldsCard');
+  const loanPurposeDesc = document.getElementById('loanPurposeDesc');
+  const contractUploadBtn = document.getElementById('contractUploadBtn');
+  const uploadContractFile = document.getElementById('uploadContractFile');
+  const contractFileNameDisplay = document.getElementById('contractFileNameDisplay');
+  const contractDownloadBtn = document.getElementById('contractDownloadBtn');
+  const customerNameInput = document.getElementById('customerNameInput');
+  const customerIdInput = document.getElementById('customerIdInput');
+  const businessScopeInput = document.getElementById('businessScopeInput');
+  const customerIndustryInput = document.getElementById('customerIndustryInput');
+  const businessAddrInput = document.getElementById('businessAddrInput');
+  const regAddrInput = document.getElementById('regAddrInput');
+  const homeAddrInput = document.getElementById('homeAddrInput');
+  
+  // 模拟当前附件
+  let currentAttachment = { name: "绿色矿山修复方案批复_2025.pdf", content: "mock-base64" };
+  // 合同基本信息附件
+  let contractAttachment = { name: "合同基本信息清单_2025.pdf", content: "mock-base64" };
+
+  function buildReturnPayload() {
+    const agriFinal = manualAgriSelect.value;
+    const greenFinal = manualGreenSelect.value;
+    let greenCategoryFinal = greenCategorySelect.value;
+    let reasonSummary = "";
+    if (agriFinal === "涉农" && greenFinal === "绿色") {
+      reasonSummary = `涉农依据:${aiResult.agriReason.substring(0,70)}; 绿色依据:${aiResult.greenReason.substring(0,90)}`;
+    } else if (agriFinal !== "涉农" && greenFinal === "绿色") {
+      reasonSummary = `人工调整为非涉农，绿色认定仍为绿色，修正说明:${modifyReason.value.substring(0,100)}`;
+    } else if (agriFinal === "涉农" && greenFinal !== "绿色") {
+      reasonSummary = `绿色标签人工修正为${greenFinal}；修正说明:${modifyReason.value.substring(0,100)}`;
+    } else {
+      reasonSummary = `复核结果: 涉农=${agriFinal}, 绿色=${greenFinal}, 修正理由:${modifyReason.value.substring(0,80)}`;
+    }
+    if(reasonSummary.length > 200) reasonSummary = reasonSummary.substring(0,197)+"...";
+
+    const agriSpecific = (agriFinal === "涉农") ? "法人类 · 农村非金融企业涉农贷款" : null;
+
+    return {
+      contractNo: "HT01232XXXXX",
+      customerType: customerTypeSelect.value,
+      loanPurposeDesc: loanPurposeDesc.value,
+      labelResult: {
+        isAgricultural: agriFinal === "涉农" ? true : (agriFinal === "非涉农" ? false : null),
+        isGreen: greenFinal === "绿色" ? true : (greenFinal === "非绿色" ? false : null),
+        agriculturalCategory: agriFinal === "涉农" ? agriSpecific : null,
+        greenCategory: greenFinal === "绿色" ? greenCategoryFinal : null,
+        status: (agriFinal === "待核实" || greenFinal === "待核实") ? "待核实" : "已确认"
+      },
+      complianceCheck: complianceResult,
+      decisionBasis: reasonSummary,
+      operator: "信贷经办岗(李明轩)",
+      attachment: currentAttachment.name,
+      modifyNote: modifyReason.value || ""
+    };
+  }
+
+  function saveToCreditSystem() {
+    const payload = buildReturnPayload();
+    console.log("智能体回传日志已记录", payload);
+    alert("已保存并同步新一代信贷系统。\n涉农标签: " + manualAgriSelect.value + " | 绿色标签: " + manualGreenSelect.value + " | 分类: " + greenCategorySelect.value + "\n数据已归档并回传ESB接口。");
+  }
+
+  // 重新识别模拟（简单重置为原始智能体结果）
+  function reidentifyAgri() {
+    manualAgriSelect.value = "涉农";
+    manualGreenSelect.value = "绿色";
+    greenCategorySelect.value = "4.2.2 太阳能利用设施建设和运营";
+    modifyReason.value = "";
+    console.log("已触发涉农重新识别，判定依据基于原始模型：" + aiResult.agriReason.substring(0,80));
+  }
+  function reidentifyGreen() {
+    manualGreenSelect.value = "绿色";
+    greenCategorySelect.value = "4.2.2 太阳能利用设施建设和运营";
+    modifyReason.value = "";
+    console.log("已触发绿色重新识别，依据绿色目录2025版重新判定：" + aiResult.greenReason.substring(0,80));
+  }
+
+  // 文件上传逻辑
+  uploadBtn.addEventListener('click', () => uploadEvidence.click());
+  uploadEvidence.addEventListener('change', (e) => {
+    if(e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      currentAttachment = { name: file.name, content: "file-data" };
+      fileNameDisplay.innerText = file.name;
+      // 模拟下载链接指向blob
+      const blobUrl = URL.createObjectURL(file);
+      downloadFileBtn.onclick = () => {
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = file.name;
+        a.click();
+        URL.revokeObjectURL(blobUrl);
+      };
+      console.log("已上传佐证材料: " + file.name);
+    }
+  });
+  // 默认下载模拟
+  downloadFileBtn.addEventListener('click', (e) => {
+    alert("演示下载: " + currentAttachment.name + " (实际系统对接对象存储)");
+  });
+
+  // 客户类型切换：公司/个人，切换客户信息字段及个人专属字段展示
+  function applyCustomerType(type) {
+    const sample = type === "个人" ? individualSample : companySample;
+    customerNameInput.value = sample.customerName;
+    customerIdInput.value = sample.customerId;
+    businessScopeInput.value = sample.businessScope;
+    customerIndustryInput.value = sample.customerIndustry;
+    businessAddrInput.value = sample.businessAddr;
+    regAddrInput.value = sample.regAddr;
+    homeAddrInput.value = sample.homeAddr;
+    // 个人客户专属字段展示
+    individualFieldsCard.style.display = (type === "个人") ? "block" : "none";
+  }
+  customerTypeSelect.addEventListener('change', (e) => {
+    applyCustomerType(e.target.value);
+    console.log("客户类型已切换为 " + e.target.value + "，识别相关字段已联动调整。");
+  });
+
+  // 合同基本信息文件上传逻辑
+  contractUploadBtn.addEventListener('click', () => uploadContractFile.click());
+  contractDownloadBtn.addEventListener('click', () => {
+    alert("演示下载: " + contractAttachment.name + " (实际系统对接对象存储)");
+  });
+  uploadContractFile.addEventListener('change', (e) => {
+    if(e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      contractAttachment = { name: file.name, content: "file-data" };
+      contractFileNameDisplay.innerText = file.name;
+      const blobUrl = URL.createObjectURL(file);
+      contractDownloadBtn.onclick = () => {
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = file.name;
+        a.click();
+        URL.revokeObjectURL(blobUrl);
+      };
+      console.log("已上传合同基本信息文件: " + file.name);
+    }
+  });
+
+  // 保存事件
+  saveBtn.addEventListener('click', () => {
+    const agriVal = manualAgriSelect.value;
+    const greenVal = manualGreenSelect.value;
+    if (agriVal === "待核实" || greenVal === "待核实") {
+      if (!confirm("存在"待核实"标签，请补充完整佐证材料，是否继续提交？系统将标记待核实并生成工单。")) return;
+    }
+    saveToCreditSystem();
+  });
+  
+  backBtn.addEventListener('click', () => {
+    if(confirm("确认返回？未保存的数据将丢失。")) {
+      window.history.back();
+    }
+  });
+
+  // 重新识别按钮
+  document.getElementById('reidentifyAgriBtn').addEventListener('click', reidentifyAgri);
+  document.getElementById('reidentifyGreenBtn').addEventListener('click', reidentifyGreen);
+
+  // 监听改变用于调试日志
+  manualAgriSelect.addEventListener('change', () => {
+    console.log("涉农标签复核变更为: " + manualAgriSelect.value);
+  });
+  manualGreenSelect.addEventListener('change', () => {
+    console.log("绿色标签复核变更为: " + manualGreenSelect.value);
+  });
+  greenCategorySelect.addEventListener('change', () => {
+    console.log("绿色分类变更为: " + greenCategorySelect.value);
+  });
+  modifyReason.addEventListener('input', () => {
+    console.log("修正理由已更新");
+  });
+  loanPurposeDesc.addEventListener('input', () => {
+    console.log("贷款用途描述已更新");
+  });
+</script>
+</body>
+</html>

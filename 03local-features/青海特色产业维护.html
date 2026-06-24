@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>青海特色产业维护</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --brand-50:#E8F0FB; --brand-100:#D1DFF4; --brand-300:#6E97D6;
+            --brand-500:#2A66C2; --brand-700:#143F8F; --brand-900:#01256A;
+            --green-50:#ECFDF5; --green-500:#10B981; --green-700:#047857;
+            --success:#10B981; --success-bg:#ECFDF5; --success-border:#A7F3D0;
+            --warning:#D97706; --warning-bg:#FFFBEB; --warning-border:#FDE68A;
+            --danger:#DC2626; --danger-bg:#FEF2F2; --danger-border:#FECACA;
+            --info:#2A66C2; --info-bg:#E8F0FB; --info-border:#D1DFF4;
+            --ink-900:#0F172A; --ink-800:#1E293B; --ink-700:#334155; --ink-600:#475569;
+            --ink-500:#64748B; --ink-400:#94A3B8; --ink-300:#CBD5E1;
+            --line-200:#E2E8F0; --bg-muted:#F1F5F9; --bg-subtle:#F8FAFC; --white:#FFFFFF;
+            --radius-sm:4px; --radius-md:6px; --radius-lg:8px; --radius-xl:12px;
+            --shadow-sm:0 1px 2px rgba(15,23,42,.05);
+            --font-sans:'PingFang SC','Microsoft YaHei','Inter',system-ui,sans-serif;
+            --font-num:'Inter','SF Pro Display',system-ui,sans-serif;
+            --font-mono:'JetBrains Mono','SF Mono','Menlo','Consolas',monospace;
+        }
+        *{box-sizing:border-box;margin:0;padding:0;}
+        body{font-family:var(--font-sans);color:var(--ink-800);background:var(--bg-subtle);font-size:14px;line-height:1.57;-webkit-font-smoothing:antialiased;}
+        .custom-scroll::-webkit-scrollbar{width:6px;height:6px;}
+        .custom-scroll::-webkit-scrollbar-track{background:transparent;}
+        .custom-scroll::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px;}
+        .custom-scroll::-webkit-scrollbar-thumb:hover{background:var(--brand-500);}
+        .font-mono{font-family:var(--font-mono);} .font-num{font-family:var(--font-num);}
+
+        .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:var(--radius-md);font-family:inherit;font-weight:500;cursor:pointer;transition:all .15s;border:1px solid transparent;line-height:1;white-space:nowrap;}
+        .btn-sm{padding:6px 12px;font-size:12px;line-height:20px;height:28px;}
+        .btn-md{padding:8px 16px;font-size:14px;line-height:22px;height:32px;}
+        .btn-primary{background:var(--brand-500);color:#fff;}
+        .btn-primary:hover{background:var(--brand-700);}
+        .btn-secondary{background:var(--white);color:var(--ink-800);border-color:var(--ink-300);}
+        .btn-secondary:hover{border-color:var(--brand-500);color:var(--brand-500);}
+        .btn-ghost{background:transparent;color:var(--brand-500);border:none;padding:4px 8px;font-size:13px;}
+        .btn-ghost:hover{background:var(--brand-50);}
+        .btn-danger-ghost{background:transparent;color:var(--danger);border:none;padding:4px 8px;font-size:13px;}
+        .btn-danger-ghost:hover{background:var(--danger-bg);}
+        .btn svg{width:14px;height:14px;stroke-width:1.75;}
+
+        .tag{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:var(--radius-sm);font-size:12px;font-weight:500;line-height:1.5;border:1px solid transparent;white-space:nowrap;}
+        .tag-default{background:var(--bg-muted);color:var(--ink-600);border-color:var(--line-200);}
+        .tag-success{background:var(--success-bg);color:var(--green-700);border-color:var(--success-border);}
+        .tag-info{background:var(--info-bg);color:var(--info);border-color:var(--info-border);}
+        .tag-warning{background:var(--warning-bg);color:var(--warning);border-color:var(--warning-border);}
+
+        .section-card{background:var(--white);border-radius:var(--radius-xl);border:1px solid var(--line-200);overflow:hidden;box-shadow:var(--shadow-sm);}
+
+        .filter-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;}
+        .filter-item{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+        .filter-item label{font-size:12px;color:var(--ink-500);font-weight:500;white-space:nowrap;}
+        .filter-item input,.filter-item select{padding:4px 8px;border:1px solid var(--line-200);border-radius:var(--radius-md);font-size:13px;background:var(--white);outline:none;transition:border-color .2s;height:28px;font-family:inherit;color:var(--ink-800);}
+        .filter-item input:focus,.filter-item select:focus{border-color:var(--brand-500);}
+        .filter-item input[type="text"]{min-width:160px;} .filter-item select{min-width:110px;}
+        .filter-actions{display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:4px;}
+        .input,.select-native{width:100%;padding:5px 12px;height:32px;font-family:inherit;font-size:14px;line-height:22px;color:var(--ink-900);background:var(--white);border:1px solid var(--ink-300);border-radius:var(--radius-md);transition:all .15s;outline:none;}
+        .input:focus,.select-native:focus{border-color:var(--brand-500);box-shadow:0 0 0 3px rgba(42,102,194,.12);}
+
+        .table-wrap{position:relative;overflow-x:auto;}
+        .table-wrap table{border-collapse:separate;border-spacing:0;width:100%;}
+        .table-wrap th,.table-wrap td{white-space:nowrap;}
+        .sticky-right{position:sticky;right:0;z-index:10;background:var(--white);border-left:1px solid var(--line-200);}
+        .sticky-right-header{position:sticky;right:0;z-index:20;background:var(--bg-muted);border-left:1px solid var(--line-200);}
+        .data-row{border-bottom:1px solid var(--line-200);transition:background .12s;}
+        .data-row:hover{background:rgba(241,245,249,.6);}
+        .data-row:hover .sticky-right{background:rgba(241,245,249,.9);}
+        thead th{background:var(--bg-muted);color:var(--ink-700);font-weight:600;text-align:left;padding:10px 12px;border-bottom:1px solid var(--line-200);white-space:nowrap;font-size:12px;}
+        tbody td{padding:10px 12px;border-bottom:1px solid var(--line-200);font-size:13px;vertical-align:middle;}
+        .pagination{display:flex;align-items:center;gap:var(--s-3,12px);padding:10px 16px;border-top:1px solid var(--line-200);background:var(--white);font-size:13px;color:var(--ink-600);}
+        .pagination-controls{margin-left:auto;display:flex;gap:4px;align-items:center;}
+        .page-btn{min-width:30px;height:30px;padding:0 6px;border:1px solid var(--line-200);background:var(--white);border-radius:var(--radius-md);font-size:13px;color:var(--ink-800);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all .15s;}
+        .page-btn.active{background:var(--brand-500);border-color:var(--brand-500);color:#fff;}
+        .page-btn:disabled{color:var(--ink-300);cursor:not-allowed;background:var(--bg-muted);}
+    </style>
+</head>
+<body>
+
+<main class="flex-1 flex flex-col overflow-hidden" style="background:var(--bg-subtle)">
+    <div class="flex-1 overflow-y-auto custom-scroll" style="padding:24px">
+        <div class="section-card">
+            <!-- 筛选栏 -->
+            <div style="padding:12px 20px;border-bottom:1px solid var(--line-200);background:var(--bg-subtle)">
+                <div class="filter-row">
+                    <div class="filter-item"><label>产业名称</label><input type="text" id="fName" placeholder="请输入产业名称"></div>
+                    <div class="filter-item"><label>产业状态</label><select id="fStatus"><option value="">全部</option><option value="1">启用</option><option value="0">禁用</option></select></div>
+                    <div class="filter-actions"><button class="btn btn-primary btn-sm" onclick="handleSearch()">查询</button><button class="btn btn-secondary btn-sm" onclick="handleReset()">重置</button></div>
+                </div>
+            </div>
+
+            <!-- 操作栏 -->
+            <div class="flex items-center justify-between px-6 py-3 border-b border-slate-100">
+                <div class="flex gap-2">
+                    <button class="btn btn-primary btn-sm" onclick="openAddModal()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 5v14M5 12h14"/></svg>新增产业
+                    </button>
+                    <button class="btn btn-secondary btn-sm" onclick="exportList()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg>导出数据
+                    </button>
+                </div>
+                <span class="text-sm text-slate-400">共 <span id="cntBar" class="text-slate-600 font-medium">10</span> 条</span>
+            </div>
+
+            <!-- 表格 -->
+            <div class="table-wrap custom-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:50px;text-align:center;">序号</th>
+                            <th style="min-width:120px;">产业编码</th>
+                            <th style="min-width:160px;">产业名称</th>
+                            <th style="min-width:200px;">产业描述</th>
+                            <th style="min-width:100px;">所属区域</th>
+                            <th style="min-width:80px;text-align:center;">排序</th>
+                            <th style="min-width:80px;text-align:center;">状态</th>
+                            <th class="sticky-right-header" style="min-width:120px;text-align:center;">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+
+            <!-- 分页 -->
+            <div class="pagination" id="paginationBar">
+                <span>共 <strong id="totalCount">10</strong> 条</span>
+                <div class="pagination-controls" id="pageControls"></div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+// ============ 数据 ============
+var industryData = [
+    { id:1, code:'QH_01', name:'牦牛产业', desc:'青海牦牛养殖、屠宰加工、冷链物流及品牌建设全产业链', region:'全省（青南牧区为主）', sort:1, status:1 },
+    { id:2, code:'QH_02', name:'藏羊产业', desc:'青海藏羊良种繁育、草地放牧、肉毛皮加工及溯源体系', region:'全省（环湖牧区为主）', sort:2, status:1 },
+    { id:3, code:'QH_03', name:'青稞产业', desc:'高原青稞种植、功能食品研发、精深加工及品牌营销', region:'海北州、海南州、海东市', sort:3, status:1 },
+    { id:4, code:'QH_04', name:'油菜产业', desc:'优质杂交油菜育种、规模化种植、油脂加工及副产物利用', region:'海北州、海南州、海东市', sort:4, status:1 },
+    { id:5, code:'QH_05', name:'马铃薯产业', desc:'脱毒种薯繁育、高原马铃薯种植、淀粉及食品加工', region:'海东市、西宁市', sort:5, status:1 },
+    { id:6, code:'QH_06', name:'冷水鱼产业', desc:'沿黄冷水养殖（三倍体虹鳟等）、鱼卵孵化、精深加工及出口', region:'黄南州、海南州（沿黄谷地）', sort:6, status:1 },
+    { id:7, code:'QH_07', name:'枸杞产业', desc:'柴达木有机枸杞种植、干燥加工、保健食品开发及地理标志保护', region:'海西州（柴达木盆地）', sort:7, status:1 },
+    { id:8, code:'QH_08', name:'藜麦产业', desc:'高原藜麦种植、功能成分提取、健康食品及饲料综合开发', region:'海西州、海南州', sort:8, status:1 },
+    { id:9, code:'QH_09', name:'果蔬产业', desc:'高原特色果蔬（设施蔬菜、小杂果等）种植、冷链保鲜及深加工', region:'海东市、西宁市（河湟谷地）', sort:9, status:1 },
+    { id:10, code:'QH_10', name:'中藏药材产业', desc:'青海道地中藏药材（虫草、红景天、大黄等）GAP种植、饮片加工及制剂研发', region:'果洛州、玉树州、黄南州', sort:10, status:1 }
+];
+
+var filteredData = [];
+var currentPage = 1;
+var pageSize = 10;
+
+// ============ 初始化 ============
+function init() {
+    filteredData = [...industryData];
+    renderTable();
+}
+init();
+
+// ============ 筛选 ============
+function handleSearch() {
+    var name = document.getElementById('fName').value.trim().toLowerCase();
+    var status = document.getElementById('fStatus').value;
+    filteredData = industryData.filter(function(d) {
+        var matchName = !name || d.name.toLowerCase().includes(name);
+        var matchStatus = status === '' || d.status === parseInt(status);
+        return matchName && matchStatus;
+    });
+    currentPage = 1;
+    renderTable();
+}
+
+function handleReset() {
+    document.getElementById('fName').value = '';
+    document.getElementById('fStatus').value = '';
+    filteredData = [...industryData];
+    currentPage = 1;
+    renderTable();
+}
+
+// ============ 渲染表格 ============
+function renderTable() {
+    var start = (currentPage - 1) * pageSize;
+    var pageData = filteredData.slice(start, start + pageSize);
+    var html = '';
+    pageData.forEach(function(d, i) {
+        var statusTag = d.status === 1
+            ? '<span class="tag tag-success">启用</span>'
+            : '<span class="tag tag-default">禁用</span>';
+        html += '<tr class="data-row">';
+        html += '<td style="text-align:center;color:var(--ink-500);">' + (start + i + 1) + '</td>';
+        html += '<td><span class="font-mono" style="font-size:12px;background:var(--bg-muted);padding:2px 6px;border-radius:4px;">' + d.code + '</span></td>';
+        html += '<td><span style="font-weight:500;">' + d.name + '</span></td>';
+        html += '<td><span style="color:var(--ink-600);" title="' + d.desc + '">' + d.desc + '</span></td>';
+        html += '<td><span style="font-size:12px;color:var(--ink-500);">' + d.region + '</span></td>';
+        html += '<td style="text-align:center;">' + d.sort + '</td>';
+        html += '<td style="text-align:center;">' + statusTag + '</td>';
+        html += '<td class="sticky-right" style="text-align:center;">';
+        html += '<button class="btn btn-ghost btn-sm" onclick="openEditModal(' + d.id + ')" style="color:var(--brand-500);">编辑</button>';
+        html += '<button class="btn btn-ghost btn-sm" onclick="toggleStatus(' + d.id + ')" style="color:' + (d.status === 1 ? 'var(--warning)' : 'var(--success)') + ';">' + (d.status === 1 ? '禁用' : '启用') + '</button>';
+        html += '</td>';
+        html += '</tr>';
+    });
+    document.getElementById('tableBody').innerHTML = html || '<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--ink-400);">暂无数据</td></tr>';
+    document.getElementById('cntBar').textContent = filteredData.length;
+    document.getElementById('totalCount').textContent = filteredData.length;
+    renderPagination();
+}
+
+function renderPagination() {
+    var totalPages = Math.ceil(filteredData.length / pageSize);
+    var html = '';
+    html += '<button class="page-btn" onclick="goPage(' + (currentPage - 1) + ')"' + (currentPage <= 1 ? ' disabled' : '') + '>‹</button>';
+    for (var p = 1; p <= totalPages; p++) {
+        html += '<button class="page-btn' + (p === currentPage ? ' active' : '') + '" onclick="goPage(' + p + ')">' + p + '</button>';
+    }
+    html += '<button class="page-btn" onclick="goPage(' + (currentPage + 1) + ')"' + (currentPage >= totalPages ? ' disabled' : '') + '>›</button>';
+    document.getElementById('pageControls').innerHTML = html;
+}
+
+function goPage(p) {
+    var totalPages = Math.ceil(filteredData.length / pageSize);
+    if (p < 1 || p > totalPages) return;
+    currentPage = p;
+    renderTable();
+}
+
+// ============ 编辑 ============
+function openEditModal(id) {
+    var d = industryData.find(function(item) { return item.id === id; });
+    if (!d) return;
+    document.getElementById('modalTitle').textContent = '编辑产业信息';
+    document.getElementById('editId').value = d.id;
+    document.getElementById('editCode').value = d.code;
+    document.getElementById('editName').value = d.name;
+    document.getElementById('editDesc').value = d.desc;
+    document.getElementById('editRegion').value = d.region;
+    document.getElementById('editSort').value = d.sort;
+    document.querySelector('input[name="editStatus"][value="' + d.status + '"]').checked = true;
+    document.getElementById('editModal').classList.add('open');
+}
+
+function openAddModal() {
+    document.getElementById('modalTitle').textContent = '新增产业';
+    document.getElementById('editId').value = '';
+    document.getElementById('editCode').value = '';
+    document.getElementById('editName').value = '';
+    document.getElementById('editDesc').value = '';
+    document.getElementById('editRegion').value = '';
+    document.getElementById('editSort').value = '';
+    document.querySelector('input[name="editStatus"][value="1"]').checked = true;
+    document.getElementById('editModal').classList.add('open');
+}
+
+function closeEditModal() {
+    document.getElementById('editModal').classList.remove('open');
+}
+
+function saveIndustry() {
+    var id = document.getElementById('editId').value;
+    var code = document.getElementById('editCode').value.trim();
+    var name = document.getElementById('editName').value.trim();
+    var desc = document.getElementById('editDesc').value.trim();
+    var region = document.getElementById('editRegion').value.trim();
+    var sort = parseInt(document.getElementById('editSort').value) || 0;
+    var status = parseInt(document.querySelector('input[name="editStatus"]:checked').value);
+
+    if (!name) { alert('请输入产业名称'); return; }
+
+    if (id) {
+        var item = industryData.find(function(d) { return d.id === parseInt(id); });
+        if (item) {
+            item.code = code; item.name = name; item.desc = desc;
+            item.region = region; item.sort = sort; item.status = status;
+        }
+    } else {
+        var newId = Math.max.apply(null, industryData.map(function(d) { return d.id; })) + 1;
+        industryData.push({ id: newId, code: code || ('QH_' + newId), name: name, desc: desc, region: region, sort: sort, status: status });
+    }
+    closeEditModal();
+    handleSearch();
+}
+
+function toggleStatus(id) {
+    var item = industryData.find(function(d) { return d.id === id; });
+    if (item) {
+        item.status = item.status === 1 ? 0 : 1;
+        handleSearch();
+    }
+}
+
+function exportList() {
+    alert('导出功能：导出青海特色产业列表数据');
+}
+
+// ============ 模态框关闭 ============
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('modal-mask') && e.target.classList.contains('open')) {
+        e.target.classList.remove('open');
+    }
+});
+</script>
+
+<!-- 编辑模态框 -->
+<div class="modal-mask" id="editModal" style="position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:1500;display:none;align-items:center;justify-content:center;">
+    <div style="background:var(--white);border-radius:var(--radius-2xl);box-shadow:0 20px 40px rgba(15,23,42,.16);width:100%;max-width:560px;overflow:hidden;">
+        <div style="display:flex;align-items:center;padding:16px 24px;border-bottom:1px solid var(--line-200);">
+            <span style="font-size:16px;font-weight:600;color:var(--ink-900);" id="modalTitle">编辑产业信息</span>
+            <button onclick="closeEditModal()" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--ink-500);padding:4px;display:flex;border-radius:var(--radius-sm);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div style="padding:24px;max-height:70vh;overflow-y:auto;">
+            <input type="hidden" id="editId">
+            <div style="margin-bottom:16px;">
+                <label style="font-size:14px;color:var(--ink-800);font-weight:500;margin-bottom:6px;display:block;">产业编码</label>
+                <input type="text" class="input" id="editCode" placeholder="请输入产业编码">
+            </div>
+            <div style="margin-bottom:16px;">
+                <label style="font-size:14px;color:var(--ink-800);font-weight:500;margin-bottom:6px;display:block;"><span style="color:var(--danger);">*</span> 产业名称</label>
+                <input type="text" class="input" id="editName" placeholder="请输入产业名称">
+            </div>
+            <div style="margin-bottom:16px;">
+                <label style="font-size:14px;color:var(--ink-800);font-weight:500;margin-bottom:6px;display:block;">产业描述</label>
+                <textarea class="input" id="editDesc" rows="3" style="height:auto;resize:vertical;" placeholder="请输入产业描述"></textarea>
+            </div>
+            <div style="margin-bottom:16px;">
+                <label style="font-size:14px;color:var(--ink-800);font-weight:500;margin-bottom:6px;display:block;">所属区域</label>
+                <input type="text" class="input" id="editRegion" placeholder="如：海西州、海南州">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                <div>
+                    <label style="font-size:14px;color:var(--ink-800);font-weight:500;margin-bottom:6px;display:block;">排序</label>
+                    <input type="number" class="input" id="editSort" placeholder="序号">
+                </div>
+                <div>
+                    <label style="font-size:14px;color:var(--ink-800);font-weight:500;margin-bottom:6px;display:block;">状态</label>
+                    <div style="display:flex;gap:24px;padding-top:6px;">
+                        <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;">
+                            <input type="radio" name="editStatus" value="1" checked style="width:16px;height:16px;"> 启用
+                        </label>
+                        <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;">
+                            <input type="radio" name="editStatus" value="0" style="width:16px;height:16px;"> 禁用
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:12px;padding:12px 24px;border-top:1px solid var(--line-200);background:var(--bg-subtle);">
+            <button class="btn btn-secondary btn-md" onclick="closeEditModal()">取消</button>
+            <button class="btn btn-primary btn-md" onclick="saveIndustry()">保存</button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
